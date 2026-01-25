@@ -12,158 +12,343 @@ import { ResponseDisplay } from "@/components/response-display";
 import { HealthIndicator } from "@/components/health-indicator";
 import { Source } from "@/lib/api";
 
-// 3D Animated Icosahedron with orbiting elements
-function IcosahedronVisualization() {
+// AI Face Recognition Visualization - Lines and Dots
+function AIFaceVisualization() {
+  // Face outline points (stylized AI face shape)
+  const facePoints = [
+    // Forehead curve
+    { x: 200, y: 60 },
+    { x: 240, y: 55 },
+    { x: 280, y: 60 },
+    { x: 310, y: 80 },
+    // Right side of face
+    { x: 330, y: 120 },
+    { x: 340, y: 170 },
+    { x: 335, y: 220 },
+    { x: 320, y: 270 },
+    // Chin
+    { x: 290, y: 310 },
+    { x: 250, y: 330 },
+    { x: 200, y: 340 },
+    { x: 150, y: 330 },
+    { x: 110, y: 310 },
+    // Left side of face
+    { x: 80, y: 270 },
+    { x: 65, y: 220 },
+    { x: 60, y: 170 },
+    { x: 70, y: 120 },
+    // Back to forehead
+    { x: 90, y: 80 },
+    { x: 120, y: 60 },
+    { x: 160, y: 55 },
+  ];
+
+  // Eye points
+  const leftEye = [
+    { x: 130, y: 160 },
+    { x: 145, y: 150 },
+    { x: 165, y: 150 },
+    { x: 180, y: 160 },
+    { x: 165, y: 170 },
+    { x: 145, y: 170 },
+  ];
+
+  const rightEye = [
+    { x: 220, y: 160 },
+    { x: 235, y: 150 },
+    { x: 255, y: 150 },
+    { x: 270, y: 160 },
+    { x: 255, y: 170 },
+    { x: 235, y: 170 },
+  ];
+
+  // Nose points
+  const nose = [
+    { x: 200, y: 180 },
+    { x: 190, y: 230 },
+    { x: 200, y: 245 },
+    { x: 210, y: 230 },
+  ];
+
+  // Mouth points
+  const mouth = [
+    { x: 150, y: 280 },
+    { x: 175, y: 275 },
+    { x: 200, y: 280 },
+    { x: 225, y: 275 },
+    { x: 250, y: 280 },
+  ];
+
+  // Neural network connection points
+  const neuralPoints = [
+    { x: 50, y: 100 }, { x: 30, y: 200 }, { x: 45, y: 300 },
+    { x: 350, y: 100 }, { x: 370, y: 200 }, { x: 355, y: 300 },
+    { x: 100, y: 30 }, { x: 200, y: 20 }, { x: 300, y: 30 },
+    { x: 100, y: 370 }, { x: 200, y: 380 }, { x: 300, y: 370 },
+  ];
+
   return (
-    <div className="relative w-full max-w-xl mx-auto h-[400px] lg:h-[500px]">
-      {/* Main 3D Scene */}
-      <div className="absolute inset-0 flex items-center justify-center">
-        {/* Rotating icosahedron wireframe */}
-        <motion.div
-          className="relative"
-          animate={{ rotateY: 360, rotateX: 360 }}
-          transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-          style={{ transformStyle: "preserve-3d", perspective: "1000px" }}
-        >
-          <svg
-            width="300"
-            height="300"
-            viewBox="0 0 200 200"
-            className="lg:w-[380px] lg:h-[380px]"
-          >
-            <defs>
-              <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="black" stopOpacity="0.4" />
-                <stop offset="100%" stopColor="black" stopOpacity="0.1" />
-              </linearGradient>
-            </defs>
-
-            {/* Icosahedron edges - creates a complex geometric shape */}
-            <g fill="none" stroke="url(#lineGradient)" strokeWidth="0.8">
-              {/* Top pentagon */}
-              <polygon points="100,10 140,40 130,85 70,85 60,40" />
-              {/* Bottom pentagon */}
-              <polygon points="100,190 60,160 70,115 130,115 140,160" />
-              {/* Connecting triangles top to middle */}
-              <line x1="100" y1="10" x2="70" y2="115" />
-              <line x1="100" y1="10" x2="130" y2="115" />
-              <line x1="140" y1="40" x2="130" y2="115" />
-              <line x1="140" y1="40" x2="140" y2="160" />
-              <line x1="130" y1="85" x2="140" y2="160" />
-              <line x1="130" y1="85" x2="100" y2="190" />
-              <line x1="70" y1="85" x2="100" y2="190" />
-              <line x1="70" y1="85" x2="60" y2="160" />
-              <line x1="60" y1="40" x2="60" y2="160" />
-              <line x1="60" y1="40" x2="70" y2="115" />
-              {/* Middle band connections */}
-              <line x1="70" y1="115" x2="60" y2="160" />
-              <line x1="130" y1="115" x2="140" y2="160" />
-            </g>
-
-            {/* Vertex dots */}
-            <g fill="black">
-              {/* Top */}
-              <circle cx="100" cy="10" r="3" opacity="0.6" />
-              <circle cx="140" cy="40" r="2.5" opacity="0.4" />
-              <circle cx="130" cy="85" r="2.5" opacity="0.4" />
-              <circle cx="70" cy="85" r="2.5" opacity="0.4" />
-              <circle cx="60" cy="40" r="2.5" opacity="0.4" />
-              {/* Middle */}
-              <circle cx="70" cy="115" r="2.5" opacity="0.4" />
-              <circle cx="130" cy="115" r="2.5" opacity="0.4" />
-              {/* Bottom */}
-              <circle cx="100" cy="190" r="3" opacity="0.6" />
-              <circle cx="140" cy="160" r="2.5" opacity="0.4" />
-              <circle cx="60" cy="160" r="2.5" opacity="0.4" />
-            </g>
-          </svg>
-        </motion.div>
-
-        {/* THE RED SQUARE - Main accent element */}
-        <motion.div
-          className="absolute w-12 h-12 lg:w-16 lg:h-16 bg-red-500"
-          animate={{
-            scale: [1, 1.15, 1, 0.9, 1],
-            rotate: [0, 90, 180, 270, 360],
-          }}
-          transition={{
-            duration: 10,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
+    <div className="relative w-full max-w-xl mx-auto h-[400px] lg:h-[480px]">
+      <svg
+        viewBox="0 0 400 400"
+        className="w-full h-full"
+        style={{ overflow: "visible" }}
+      >
+        {/* Scanning lines effect */}
+        <motion.line
+          x1="0" y1="0" x2="400" y2="0"
+          stroke="rgba(239, 68, 68, 0.3)"
+          strokeWidth="2"
+          animate={{ y1: [0, 400, 0], y2: [0, 400, 0] }}
+          transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
         />
 
-        {/* Orbiting red squares */}
-        <motion.div
-          className="absolute w-full h-full"
-          animate={{ rotate: 360 }}
-          transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-        >
-          <motion.div
-            className="absolute top-[10%] left-1/2 -translate-x-1/2 w-4 h-4 lg:w-5 lg:h-5 bg-red-500"
-            animate={{ opacity: [0.8, 0.4, 0.8] }}
-            transition={{ duration: 2, repeat: Infinity }}
-          />
-        </motion.div>
+        {/* Neural network connections to face */}
+        {neuralPoints.map((point, i) => (
+          <motion.g key={`neural-${i}`}>
+            <motion.line
+              x1={point.x}
+              y1={point.y}
+              x2={200}
+              y2={200}
+              stroke="black"
+              strokeWidth="0.5"
+              strokeDasharray="4,4"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: [0.1, 0.3, 0.1] }}
+              transition={{ duration: 2, repeat: Infinity, delay: i * 0.15 }}
+            />
+            <motion.circle
+              cx={point.x}
+              cy={point.y}
+              r="3"
+              fill="black"
+              animate={{
+                scale: [1, 1.5, 1],
+                opacity: [0.3, 0.6, 0.3]
+              }}
+              transition={{ duration: 2, repeat: Infinity, delay: i * 0.1 }}
+            />
+          </motion.g>
+        ))}
 
-        <motion.div
-          className="absolute w-full h-full"
-          animate={{ rotate: -360 }}
-          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-        >
-          <motion.div
-            className="absolute bottom-[15%] left-1/2 -translate-x-1/2 w-3 h-3 lg:w-4 lg:h-4 bg-red-500/70"
-            animate={{ opacity: [0.6, 0.3, 0.6] }}
-            transition={{ duration: 3, repeat: Infinity }}
-          />
-        </motion.div>
-
-        <motion.div
-          className="absolute w-full h-full"
-          animate={{ rotate: 360 }}
-          transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
-        >
-          <motion.div
-            className="absolute top-1/2 right-[8%] -translate-y-1/2 w-2.5 h-2.5 lg:w-3 lg:h-3 bg-red-500/50"
-            animate={{ opacity: [0.5, 0.8, 0.5] }}
-            transition={{ duration: 2.5, repeat: Infinity }}
-          />
-        </motion.div>
-
-        {/* Floating particles */}
-        {[...Array(8)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-1 h-1 rounded-full bg-black/20"
-            style={{
-              top: `${20 + (i * 10) % 60}%`,
-              left: `${15 + (i * 12) % 70}%`,
-            }}
+        {/* Face outline with animated dots */}
+        {facePoints.map((point, i) => (
+          <motion.circle
+            key={`face-${i}`}
+            cx={point.x}
+            cy={point.y}
+            r="4"
+            fill="black"
             animate={{
-              y: [0, -10, 0],
-              opacity: [0.2, 0.5, 0.2],
+              scale: [1, 1.3, 1],
+              opacity: [0.6, 1, 0.6],
             }}
             transition={{
-              duration: 3 + i * 0.5,
+              duration: 1.5,
               repeat: Infinity,
-              ease: "easeInOut",
-              delay: i * 0.3,
+              delay: i * 0.08,
             }}
           />
         ))}
 
-        {/* Subtle orbital rings */}
-        <motion.div
-          className="absolute w-[280px] h-[280px] lg:w-[360px] lg:h-[360px] border border-black/5 rounded-full"
-          animate={{ rotate: 360 }}
-          transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+        {/* Face outline connections */}
+        <motion.path
+          d={`M ${facePoints.map(p => `${p.x},${p.y}`).join(' L ')} Z`}
+          fill="none"
+          stroke="black"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          initial={{ pathLength: 0 }}
+          animate={{ pathLength: 1 }}
+          transition={{ duration: 2, ease: "easeInOut" }}
         />
-        <motion.div
-          className="absolute w-[220px] h-[220px] lg:w-[280px] lg:h-[280px] border border-black/5 rounded-full"
-          animate={{ rotate: -360 }}
-          transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+
+        {/* Left eye */}
+        <motion.path
+          d={`M ${leftEye.map(p => `${p.x},${p.y}`).join(' L ')} Z`}
+          fill="none"
+          stroke="black"
+          strokeWidth="1.5"
+          animate={{ opacity: [0.7, 1, 0.7] }}
+          transition={{ duration: 2, repeat: Infinity }}
         />
-      </div>
+        {leftEye.map((point, i) => (
+          <motion.circle
+            key={`left-eye-${i}`}
+            cx={point.x}
+            cy={point.y}
+            r="3"
+            fill="black"
+            animate={{ scale: [1, 1.2, 1] }}
+            transition={{ duration: 1, repeat: Infinity, delay: i * 0.1 }}
+          />
+        ))}
+        {/* Left pupil */}
+        <motion.circle
+          cx="155"
+          cy="160"
+          r="6"
+          fill="black"
+          animate={{ scale: [1, 0.8, 1] }}
+          transition={{ duration: 3, repeat: Infinity }}
+        />
+
+        {/* Right eye */}
+        <motion.path
+          d={`M ${rightEye.map(p => `${p.x},${p.y}`).join(' L ')} Z`}
+          fill="none"
+          stroke="black"
+          strokeWidth="1.5"
+          animate={{ opacity: [0.7, 1, 0.7] }}
+          transition={{ duration: 2, repeat: Infinity }}
+        />
+        {rightEye.map((point, i) => (
+          <motion.circle
+            key={`right-eye-${i}`}
+            cx={point.x}
+            cy={point.y}
+            r="3"
+            fill="black"
+            animate={{ scale: [1, 1.2, 1] }}
+            transition={{ duration: 1, repeat: Infinity, delay: i * 0.1 }}
+          />
+        ))}
+        {/* Right pupil */}
+        <motion.circle
+          cx="245"
+          cy="160"
+          r="6"
+          fill="black"
+          animate={{ scale: [1, 0.8, 1] }}
+          transition={{ duration: 3, repeat: Infinity }}
+        />
+
+        {/* Nose */}
+        <motion.path
+          d={`M ${nose.map(p => `${p.x},${p.y}`).join(' L ')}`}
+          fill="none"
+          stroke="black"
+          strokeWidth="1.5"
+          animate={{ opacity: [0.5, 0.8, 0.5] }}
+          transition={{ duration: 2.5, repeat: Infinity }}
+        />
+        {nose.map((point, i) => (
+          <motion.circle
+            key={`nose-${i}`}
+            cx={point.x}
+            cy={point.y}
+            r="3"
+            fill="black"
+            animate={{ scale: [1, 1.3, 1] }}
+            transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.15 }}
+          />
+        ))}
+
+        {/* Mouth */}
+        <motion.path
+          d={`M ${mouth.map(p => `${p.x},${p.y}`).join(' L ')}`}
+          fill="none"
+          stroke="black"
+          strokeWidth="1.5"
+          animate={{ opacity: [0.5, 0.8, 0.5] }}
+          transition={{ duration: 2, repeat: Infinity }}
+        />
+        {mouth.map((point, i) => (
+          <motion.circle
+            key={`mouth-${i}`}
+            cx={point.x}
+            cy={point.y}
+            r="3"
+            fill="black"
+            animate={{ scale: [1, 1.2, 1] }}
+            transition={{ duration: 1.2, repeat: Infinity, delay: i * 0.1 }}
+          />
+        ))}
+
+        {/* Recognition frame corners */}
+        <motion.g
+          animate={{ opacity: [0.4, 0.8, 0.4] }}
+          transition={{ duration: 1.5, repeat: Infinity }}
+        >
+          {/* Top-left corner */}
+          <path d="M 50 80 L 50 50 L 80 50" fill="none" stroke="#ef4444" strokeWidth="3" />
+          {/* Top-right corner */}
+          <path d="M 320 50 L 350 50 L 350 80" fill="none" stroke="#ef4444" strokeWidth="3" />
+          {/* Bottom-left corner */}
+          <path d="M 50 320 L 50 350 L 80 350" fill="none" stroke="#ef4444" strokeWidth="3" />
+          {/* Bottom-right corner */}
+          <path d="M 320 350 L 350 350 L 350 320" fill="none" stroke="#ef4444" strokeWidth="3" />
+        </motion.g>
+
+        {/* Red accent square in center */}
+        <motion.rect
+          x="185"
+          y="185"
+          width="30"
+          height="30"
+          fill="#ef4444"
+          animate={{
+            scale: [1, 1.2, 1],
+            opacity: [0.8, 1, 0.8],
+            rotate: [0, 90, 180, 270, 360],
+          }}
+          transition={{
+            duration: 8,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+          style={{ transformOrigin: "200px 200px" }}
+        />
+
+        {/* Data processing indicators */}
+        <motion.text
+          x="55"
+          y="45"
+          fontSize="8"
+          fill="black"
+          opacity="0.5"
+          fontFamily="monospace"
+          animate={{ opacity: [0.3, 0.6, 0.3] }}
+          transition={{ duration: 1, repeat: Infinity }}
+        >
+          ANALYZING...
+        </motion.text>
+        <motion.text
+          x="290"
+          y="365"
+          fontSize="8"
+          fill="black"
+          opacity="0.5"
+          fontFamily="monospace"
+          animate={{ opacity: [0.3, 0.6, 0.3] }}
+          transition={{ duration: 1, repeat: Infinity, delay: 0.5 }}
+        >
+          AI PROCESSING
+        </motion.text>
+      </svg>
+
+      {/* Floating red squares around the visualization */}
+      <motion.div
+        className="absolute top-[5%] right-[10%] w-4 h-4 bg-red-500"
+        animate={{ y: [0, -15, 0], opacity: [0.7, 1, 0.7] }}
+        transition={{ duration: 3, repeat: Infinity }}
+      />
+      <motion.div
+        className="absolute bottom-[10%] left-[5%] w-3 h-3 bg-red-500/70"
+        animate={{ y: [0, 10, 0], opacity: [0.5, 0.8, 0.5] }}
+        transition={{ duration: 2.5, repeat: Infinity, delay: 0.5 }}
+      />
+      <motion.div
+        className="absolute top-[40%] left-[2%] w-2 h-2 bg-red-500/50"
+        animate={{ x: [0, 10, 0], opacity: [0.4, 0.7, 0.4] }}
+        transition={{ duration: 2, repeat: Infinity, delay: 1 }}
+      />
+      <motion.div
+        className="absolute bottom-[20%] right-[5%] w-3 h-3 bg-red-500/60"
+        animate={{ y: [0, -10, 0], x: [0, 5, 0], opacity: [0.5, 0.9, 0.5] }}
+        transition={{ duration: 3.5, repeat: Infinity, delay: 0.8 }}
+      />
     </div>
   );
 }
@@ -382,14 +567,14 @@ export default function Home() {
                 </div>
               </motion.div>
 
-              {/* Right: 3D Icosahedron visualization */}
+              {/* Right: AI Face visualization */}
               <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.8, delay: 0.2 }}
                 className="hidden lg:block"
               >
-                <IcosahedronVisualization />
+                <AIFaceVisualization />
               </motion.div>
             </div>
           </div>
