@@ -1,105 +1,453 @@
-import { Button } from "@/components/ui/button";
-import { ArrowRight, Database, Search } from "lucide-react";
+"use client";
+
+import { useState, useCallback } from "react";
+import { motion } from "framer-motion";
+import { ArrowRight, Github, Zap, Shield, Database, Menu, X } from "lucide-react";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { SearchForm } from "@/components/search-form";
+import { ResponseDisplay } from "@/components/response-display";
+import { HealthIndicator } from "@/components/health-indicator";
+import { Source } from "@/lib/api";
+
+// Network visualization component (Bittensor-inspired)
+function NetworkVisualization() {
+  return (
+    <div className="relative w-full max-w-md mx-auto aspect-square">
+      <svg
+        viewBox="0 0 400 400"
+        className="w-full h-full"
+        style={{ filter: "drop-shadow(0 0 20px rgba(0,0,0,0.05))" }}
+      >
+        {/* Animated network nodes and connections */}
+        <g className="animate-float" style={{ animationDelay: "0s" }}>
+          {/* Outer nodes */}
+          {[0, 60, 120, 180, 240, 300].map((angle, i) => {
+            const x = 200 + 150 * Math.cos((angle * Math.PI) / 180);
+            const y = 200 + 150 * Math.sin((angle * Math.PI) / 180);
+            return (
+              <g key={`outer-${i}`}>
+                <line
+                  x1="200"
+                  y1="200"
+                  x2={x}
+                  y2={y}
+                  stroke="currentColor"
+                  strokeWidth="0.5"
+                  className="text-border"
+                />
+                <circle
+                  cx={x}
+                  cy={y}
+                  r="4"
+                  fill="currentColor"
+                  className="text-foreground"
+                />
+              </g>
+            );
+          })}
+          {/* Inner nodes */}
+          {[30, 90, 150, 210, 270, 330].map((angle, i) => {
+            const x = 200 + 80 * Math.cos((angle * Math.PI) / 180);
+            const y = 200 + 80 * Math.sin((angle * Math.PI) / 180);
+            return (
+              <g key={`inner-${i}`}>
+                <line
+                  x1="200"
+                  y1="200"
+                  x2={x}
+                  y2={y}
+                  stroke="currentColor"
+                  strokeWidth="0.5"
+                  className="text-border"
+                />
+                <circle
+                  cx={x}
+                  cy={y}
+                  r="3"
+                  fill="currentColor"
+                  className="text-muted-foreground"
+                />
+              </g>
+            );
+          })}
+          {/* Center node */}
+          <circle
+            cx="200"
+            cy="200"
+            r="8"
+            fill="currentColor"
+            className="text-yellow"
+          />
+          {/* Cross connections */}
+          {[0, 60, 120].map((angle, i) => {
+            const x1 = 200 + 150 * Math.cos((angle * Math.PI) / 180);
+            const y1 = 200 + 150 * Math.sin((angle * Math.PI) / 180);
+            const x2 = 200 + 150 * Math.cos(((angle + 120) * Math.PI) / 180);
+            const y2 = 200 + 150 * Math.sin(((angle + 120) * Math.PI) / 180);
+            return (
+              <line
+                key={`cross-${i}`}
+                x1={x1}
+                y1={y1}
+                x2={x2}
+                y2={y2}
+                stroke="currentColor"
+                strokeWidth="0.3"
+                className="text-border"
+              />
+            );
+          })}
+        </g>
+      </svg>
+    </div>
+  );
+}
 
 export default function Home() {
+  const [response, setResponse] = useState<string | null>(null);
+  const [sources, setSources] = useState<Source[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const handleResult = useCallback((result: string, resultSources: Source[]) => {
+    setError(null);
+    setResponse(result);
+    setSources(resultSources);
+  }, []);
+
+  const handleError = useCallback((errorMessage: string) => {
+    setResponse(null);
+    setError(errorMessage);
+  }, []);
+
+  const handleLoadingChange = useCallback((loading: boolean) => {
+    setIsLoading(loading);
+    if (loading) {
+      setResponse(null);
+      setSources([]);
+      setError(null);
+    }
+  }, []);
+
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
-      {/* Header */}
-      <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-14 max-w-screen-2xl items-center px-4">
-          <div className="mr-4 flex items-center space-x-2 font-bold">
-            <Database className="h-5 w-5" />
-            <span>SteelIntel</span>
+      {/* Header - Bittensor style */}
+      <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-sm">
+        <div className="container-center">
+          <div className="flex h-16 sm:h-20 items-center justify-between">
+            {/* Logo */}
+            <Link href="/" className="flex items-center space-x-2">
+              <span className="text-xl font-semibold tracking-tight">SteelIntel</span>
+            </Link>
+
+            {/* Desktop Navigation - Bittensor uppercase style */}
+            <nav className="hidden md:flex items-center space-x-10">
+              <Link href="#features" className="nav-link">
+                About
+              </Link>
+              <Link href="#demo" className="nav-link">
+                Demo
+              </Link>
+              <Link href="/docs" className="nav-link">
+                Docs
+              </Link>
+              <a
+                href="https://github.com/davidfertube/knowledge_tool"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="nav-link"
+              >
+                GitHub
+              </a>
+            </nav>
+
+            {/* Mobile menu button */}
+            <button
+              className="md:hidden p-2 touch-target"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label="Toggle menu"
+            >
+              {mobileMenuOpen ? (
+                <X className="h-6 w-6" />
+              ) : (
+                <Menu className="h-6 w-6" />
+              )}
+            </button>
           </div>
-          <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
-            <nav className="flex items-center space-x-6 text-sm font-medium">
+        </div>
+
+        {/* Mobile Navigation */}
+        {mobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="md:hidden border-t border-border bg-background"
+          >
+            <nav className="container-center py-6 space-y-4">
+              <Link
+                href="#features"
+                className="block nav-link py-2"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                About
+              </Link>
+              <Link
+                href="#demo"
+                className="block nav-link py-2"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Demo
+              </Link>
               <Link
                 href="/docs"
-                className="transition-colors hover:text-foreground/80 text-foreground/60"
+                className="block nav-link py-2"
+                onClick={() => setMobileMenuOpen(false)}
               >
                 Docs
               </Link>
-              <Link
-                href="/specs"
-                className="transition-colors hover:text-foreground/80 text-foreground/60"
+              <a
+                href="https://github.com/davidfertube/knowledge_tool"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block nav-link py-2"
+                onClick={() => setMobileMenuOpen(false)}
               >
-                Specs
-              </Link>
+                GitHub
+              </a>
+              <div className="pt-4">
+                <HealthIndicator />
+              </div>
             </nav>
-            <div className="ml-4 flex items-center space-x-2">
-              <Button variant="outline" className="h-9">
-                Sign In
-              </Button>
-            </div>
-          </div>
-        </div>
+          </motion.div>
+        )}
       </header>
 
-      {/* Hero Section */}
-      <main className="flex-1">
-        <section className="space-y-6 pb-8 pt-6 md:pb-12 md:pt-10 lg:py-32">
-          <div className="container flex max-w-[64rem] flex-col items-center gap-4 text-center">
-            <div className="rounded-2xl bg-muted px-4 py-1.5 text-sm font-medium">
-              Knowledge Management for Oil & Gas Steel
-            </div>
-            <h1 className="font-heading text-3xl sm:text-5xl md:text-6xl lg:text-7xl">
-              The intelligent engine for{" "}
-              <span className="text-primary">steel specifications</span>
-            </h1>
-            <p className="max-w-[42rem] leading-normal text-muted-foreground sm:text-xl sm:leading-8">
-              Instant answers from your technical documents. Powered by advanced semantic search and AI agents.
-            </p>
-            <div className="space-x-4">
-              <Button size="lg" className="h-11 px-8">
-                Get Started
-              </Button>
-              <Button size="lg" variant="outline" className="h-11 px-8">
-                View Demo
-              </Button>
+      <main className="flex-1 pt-16 sm:pt-20">
+        {/* Hero Section - Bittensor inspired */}
+        <section className="section-padding">
+          <div className="container-center">
+            <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+              {/* Left: Text content */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+                className="text-center lg:text-left"
+              >
+                <p className="label-section mb-4">
+                  Knowledge Management for Oil & Gas
+                </p>
+                <h1 className="heading-hero mb-6">
+                  The intelligent engine for{" "}
+                  <span className="underline-yellow">steel specifications</span>
+                </h1>
+                <p className="prose-body mb-8 max-w-xl mx-auto lg:mx-0">
+                  Instant answers from your technical documents. Query ASTM standards,
+                  material properties, and compliance requirements with AI-powered
+                  semantic search.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                  <Button size="lg" className="btn-primary touch-target">
+                    Get Started
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                  <Button size="lg" variant="outline" className="btn-secondary touch-target">
+                    <Github className="mr-2 h-4 w-4" />
+                    View Source
+                  </Button>
+                </div>
+              </motion.div>
+
+              {/* Right: Network visualization */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.8, delay: 0.2 }}
+                className="hidden lg:block"
+              >
+                <NetworkVisualization />
+              </motion.div>
             </div>
           </div>
         </section>
 
-        {/* Search / Interface Placeholder */}
-        <section className="container space-y-6 py-8 md:py-12 lg:py-24 max-w-[64rem]">
-          <div className="mx-auto flex w-full max-w-[50rem] flex-col space-y-4 rounded-xl border border-border bg-card p-6 shadow-sm">
-            <div className="flex flex-col space-y-2">
-              <h3 className="text-xl font-semibold">Query your knowledge base</h3>
-              <p className="text-sm text-muted-foreground">Ask questions about ASTM standards, material properties, or compliance.</p>
+        {/* Demo Section */}
+        <section id="demo" className="section-padding border-t border-border">
+          <div className="container-narrow">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+            >
+              <p className="label-section text-center mb-4">Try It Now</p>
+              <h2 className="heading-section text-center mb-4">
+                Query your knowledge base
+              </h2>
+              <p className="prose-body text-center mb-12 max-w-2xl mx-auto">
+                Ask questions about ASTM standards, material properties, or
+                compliance requirements. Get instant, cited answers.
+              </p>
+
+              {/* Search Card */}
+              <div className="card-elevated rounded-lg p-6 sm:p-8">
+                <SearchForm
+                  onResult={handleResult}
+                  onError={handleError}
+                  onLoadingChange={handleLoadingChange}
+                />
+
+                {/* Response Display */}
+                <div className="mt-8">
+                  <ResponseDisplay
+                    response={response}
+                    sources={sources}
+                    error={error}
+                    isLoading={isLoading}
+                  />
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* Features Section - Bittensor minimal style */}
+        <section id="features" className="section-padding border-t border-border">
+          <div className="container-center">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="text-center mb-16"
+            >
+              <p className="label-section mb-4">Why SteelIntel</p>
+              <h2 className="heading-section">
+                Built for engineering teams
+              </h2>
+            </motion.div>
+
+            <div className="grid md:grid-cols-3 gap-8 lg:gap-12">
+              {/* Feature 1 */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5 }}
+                className="text-center"
+              >
+                <div className="inline-flex items-center justify-center w-12 h-12 mb-6">
+                  <Zap className="w-8 h-8 text-foreground" strokeWidth={1.5} />
+                </div>
+                <h3 className="text-lg font-semibold mb-3">Instant Answers</h3>
+                <p className="text-muted-foreground text-sm leading-relaxed">
+                  Get precise answers from your technical documents in seconds.
+                  No more manual searching through PDFs.
+                </p>
+              </motion.div>
+
+              {/* Feature 2 */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+                className="text-center"
+              >
+                <div className="inline-flex items-center justify-center w-12 h-12 mb-6">
+                  <Shield className="w-8 h-8 text-foreground" strokeWidth={1.5} />
+                </div>
+                <h3 className="text-lg font-semibold mb-3">Compliance Ready</h3>
+                <p className="text-muted-foreground text-sm leading-relaxed">
+                  Every answer includes source citations. Verify compliance with
+                  ASTM, ASME, API, and NACE standards.
+                </p>
+              </motion.div>
+
+              {/* Feature 3 */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                className="text-center"
+              >
+                <div className="inline-flex items-center justify-center w-12 h-12 mb-6">
+                  <Database className="w-8 h-8 text-foreground" strokeWidth={1.5} />
+                </div>
+                <h3 className="text-lg font-semibold mb-3">Scale Ready</h3>
+                <p className="text-muted-foreground text-sm leading-relaxed">
+                  Process hundreds of technical documents. Optimized vector pipeline
+                  handles large specification libraries.
+                </p>
+              </motion.div>
             </div>
-            <div className="relative">
-              <Search className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
-              <input
-                type="text"
-                className="w-full rounded-md border border-input bg-transparent px-10 py-2.5 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                placeholder="e.g. What is the yield strength requirement for A106 Grade B?"
-              />
-            </div>
-            <div className="flex justify-end">
-              <Button>
-                Run Analysis <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            </div>
+          </div>
+        </section>
+
+        {/* CTA Section */}
+        <section className="section-padding border-t border-border bg-muted/30">
+          <div className="container-center text-center">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+            >
+              <h2 className="heading-section mb-4">
+                Ready to transform your document workflow?
+              </h2>
+              <p className="prose-body mb-8 max-w-2xl mx-auto">
+                Join engineering teams using SteelIntel to save hours of manual
+                document searching every week.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Button size="lg" className="btn-primary touch-target">
+                  Start Free Trial
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+                <Button size="lg" variant="outline" className="btn-secondary touch-target">
+                  Contact Sales
+                </Button>
+              </div>
+            </motion.div>
           </div>
         </section>
       </main>
 
-      {/* Footer */}
-      <footer className="py-6 md:px-8 md:py-0">
-        <div className="container flex flex-col items-center justify-between gap-4 md:h-24 md:flex-row">
-          <p className="text-center text-sm leading-loose text-muted-foreground md:text-left">
-            Built by{" "}
-            <a
-              href="#"
-              target="_blank"
-              rel="noreferrer"
-              className="font-medium underline underline-offset-4"
-            >
-              Antigravity
-            </a>
-            .
-          </p>
+      {/* Footer - Minimal Bittensor style */}
+      <footer className="border-t border-border py-8 sm:py-12">
+        <div className="container-center">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
+            <div className="flex items-center space-x-2">
+              <span className="font-semibold">SteelIntel</span>
+              <span className="text-muted-foreground text-sm">
+                by{" "}
+                <a
+                  href="https://github.com/davidfertube"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-foreground transition-colors"
+                >
+                  Antigravity
+                </a>
+              </span>
+            </div>
+            <div className="flex items-center space-x-6">
+              <HealthIndicator />
+              <a
+                href="https://github.com/davidfertube/knowledge_tool"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <Github className="h-5 w-5" />
+              </a>
+            </div>
+          </div>
         </div>
       </footer>
     </div>

@@ -1,36 +1,181 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SteelIntel
 
-## Getting Started
+AI-powered RAG application for querying steel specifications and oil & gas documentation.
 
-First, run the development server:
+![SteelIntel Demo](docs/demo-placeholder.png)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Features
+
+- **Semantic Search** - Query technical documents using natural language
+- **AI-Powered Q&A** - Get instant answers from ASTM standards, material properties, and compliance docs
+- **LangGraph Pipeline** - Reliable retrieval-augmented generation with Google Gemini
+- **Modern UI** - Clean, responsive design with dark mode
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|------------|
+| Frontend | Next.js 16, React 19, TypeScript, Tailwind CSS 4 |
+| Backend | FastAPI, LangChain, LangGraph |
+| AI | Google Gemini Pro, Google Embeddings |
+| Vector DB | Pinecone |
+| Deployment | Azure Static Web Apps, Azure Functions |
+
+## Quick Start
+
+### Prerequisites
+
+- Node.js 20+
+- Python 3.11+
+- [Google AI API key](https://makersuite.google.com/app/apikey) (free)
+- [Pinecone account](https://app.pinecone.io/) (free tier)
+
+### Setup
+
+1. **Clone and install dependencies**
+   ```bash
+   git clone https://github.com/davidfertube/knowledge_tool.git
+   cd knowledge_tool
+   npm install
+   pip install -r requirements.txt
+   ```
+
+2. **Configure environment**
+   ```bash
+   cp .env.example .env
+   # Edit .env with your API keys
+   ```
+
+3. **Add documents to `/data/` directory**
+   - Place PDF files with steel specifications
+   - Or use the sample data provided
+
+4. **Ingest documents**
+   ```bash
+   python backend/ingest.py
+   ```
+
+5. **Start development servers**
+   ```bash
+   # Terminal 1: Backend
+   uvicorn backend.server:app --reload --port 8000
+
+   # Terminal 2: Frontend
+   npm run dev
+   ```
+
+6. **Open [http://localhost:3000](http://localhost:3000)**
+
+## Architecture
+
+```
+                    +------------------+
+                    |    Frontend      |
+                    |   (Next.js 16)   |
+                    +--------+---------+
+                             |
+                             v
+                    +--------+---------+
+                    |    Backend       |
+                    |   (FastAPI)      |
+                    +--------+---------+
+                             |
+              +--------------+--------------+
+              |                             |
+              v                             v
+    +---------+----------+       +----------+---------+
+    |   Google Gemini    |       |     Pinecone       |
+    |   (LLM + Embed)    |       |   (Vector Store)   |
+    +--------------------+       +--------------------+
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## API Endpoints
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/chat` | Query the knowledge base |
+| GET | `/health` | Health check |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Example Request
 
-## Learn More
+```bash
+curl -X POST http://localhost:8000/api/chat \
+  -H "Content-Type: application/json" \
+  -d '{"query": "What is the yield strength of A106 Grade B?"}'
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Project Structure
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+steelintelswa/
+├── app/                    # Next.js pages
+├── components/             # React components
+├── lib/                    # Utilities
+├── backend/
+│   ├── server.py          # FastAPI app
+│   ├── agent.py           # LangGraph RAG
+│   └── ingest.py          # Document ingestion
+├── data/                   # PDF documents
+└── .github/workflows/      # CI/CD
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Environment Variables
 
-## Deploy on Vercel
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `GOOGLE_API_KEY` | Google AI Studio API key | Yes |
+| `PINECONE_API_KEY` | Pinecone API key | Yes |
+| `PINECONE_INDEX_NAME` | Pinecone index name | No (default: steel-index) |
+| `NEXT_PUBLIC_API_URL` | Backend URL | No (default: http://localhost:8000) |
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Testing
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+# Frontend tests
+npm test
+
+# Backend tests
+pytest backend/tests/
+```
+
+## Deployment
+
+### Quick Deploy to Azure
+
+1. **Set up GitHub Secrets** (see [DEPLOYMENT.md](DEPLOYMENT.md))
+2. **Run Infrastructure Workflow**: Actions → "Deploy Infrastructure" → Run
+3. **Push to main**: Automatic deployment via "Deploy to Azure" workflow
+
+### Manual Deployment
+
+```bash
+# Deploy infrastructure
+az deployment group create \
+  --resource-group steelintelswa-dev-rg \
+  --template-file infra/main.bicep \
+  --parameters environment=dev googleApiKey=<key> pineconeApiKey=<key>
+
+# Deploy frontend
+npm run build && npx @azure/static-web-apps-cli deploy
+
+# Deploy backend
+cd backend && func azure functionapp publish steelintelswa-func-dev
+```
+
+### GitHub Actions Workflows
+
+| Workflow | Trigger | Description |
+|----------|---------|-------------|
+| `test.yml` | Push/PR | Run tests and linting |
+| `azure-deploy.yml` | Push to main | Deploy frontend & backend |
+| `infra-deploy.yml` | Manual | Provision Azure resources |
+
+See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed instructions.
+
+## License
+
+MIT
+
+---
+
+Built by [Antigravity](https://github.com/davidfertube)
