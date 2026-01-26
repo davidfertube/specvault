@@ -1,10 +1,28 @@
-# CLAUDE.md - SteelIntel Project Guide
+# CLAUDE.md - Steel Knowledge Tool
 
-## Project Overview
+## MVP Status (2026-01-26)
 
-**SteelIntel** is an AI-powered RAG (Retrieval-Augmented Generation) application for querying steel specifications and oil & gas technical documentation. Built with Next.js 16, FastAPI, LangGraph, and Google Gemini.
+| Component | Status | URL |
+|-----------|--------|-----|
+| **Frontend** | LIVE | https://red-flower-0152ee60f.1.azurestaticapps.net |
+| **Backend** | Pending Azure Function App creation | https://steel-agent-api.azurewebsites.net |
+| **CI/CD** | All tests pass | GitHub Actions |
+| **Demo Mode** | Working | Canned responses for testing |
 
-**Business Model**: Enterprise SaaS with compliance focus for O&G companies.
+### What's Working
+- Frontend deployed to Azure Static Web Apps
+- Demo mode with realistic steel specification responses
+- CI/CD pipeline (frontend + backend tests pass)
+- MCP automation tools configured
+
+### What's Needed for Launch
+1. Create Azure Function App via Portal (Name: `steel-agent-api`)
+2. Add publish profile to GitHub secrets (`AZURE_FUNCTIONAPP_PUBLISH_PROFILE`)
+3. Configure CORS on Function App
+4. Upload steel specification PDFs to `/data/`
+5. Create Pinecone index and run document ingestion
+
+---
 
 ## Quick Start
 
@@ -25,6 +43,8 @@ uvicorn backend.server:app --reload --port 8000  # Backend :8000
 npm test && pytest backend/tests/
 ```
 
+---
+
 ## Architecture
 
 ```
@@ -44,14 +64,84 @@ npm test && pytest backend/tests/
 
 | File | Purpose |
 |------|---------|
-| `app/page.tsx` | Main landing page (Bittensor-inspired design) |
+| `app/page.tsx` | Main landing page |
 | `components/search-form.tsx` | Search with example queries |
 | `components/response-display.tsx` | Response with source citations |
-| `lib/api.ts` | API client with types |
+| `lib/api.ts` | API client with demo fallback |
 | `backend/agent.py` | LangGraph RAG pipeline |
 | `backend/server.py` | FastAPI with /api/chat, /health |
+| `backend/mcp_server.py` | MCP tools for automation |
 | `backend/ingest.py` | PDF ingestion to Pinecone |
-| `infra/main.bicep` | Azure infrastructure |
+| `.mcp.json` | MCP server configuration |
+
+---
+
+## MCP Automation
+
+### What is MCP?
+Model Context Protocol (MCP) enables Claude to interact with external tools and automate workflows. This project provides steel knowledge tools via MCP.
+
+### Available MCP Tools
+
+| Tool | Description | Example |
+|------|-------------|---------|
+| `query_steel_specs` | Search steel specifications | "What is yield strength of A106?" |
+| `check_compliance` | Verify material compliance | "Does 4140 meet NACE MR0175?" |
+| `compare_materials` | Compare steel grades | "Compare A53 and A106" |
+| `list_documents` | Show indexed documents | Lists all PDFs in knowledge base |
+| `get_health` | Check backend status | Returns health and mode info |
+
+### MCP Configuration
+
+The `.mcp.json` file configures the MCP servers:
+
+```json
+{
+  "mcpServers": {
+    "steel-knowledge": {
+      "command": "python",
+      "args": ["-m", "backend.mcp_server"],
+      "env": {
+        "GOOGLE_API_KEY": "${GOOGLE_API_KEY}",
+        "PINECONE_API_KEY": "${PINECONE_API_KEY}",
+        "PINECONE_INDEX_NAME": "steel-index"
+      }
+    }
+  }
+}
+```
+
+### Using MCP Tools
+
+```bash
+# Run MCP server locally
+python -m backend.mcp_server
+
+# In Claude Code
+claude "Use query_steel_specs to find yield strength of A106 Grade B"
+claude "Use check_compliance to verify 4140 meets NACE MR0175 for sour service"
+claude "Use compare_materials to compare A53 and A106"
+```
+
+---
+
+## Workflow Automation
+
+### Available Workflows
+
+1. **Document Processing**
+   - Trigger: New PDF uploaded to `/data/`
+   - Action: Ingest → Embed → Index → Notify
+
+2. **Compliance Checking**
+   - Trigger: API request or Claude query
+   - Action: Search specs → Verify requirements → Generate report
+
+3. **Batch Queries**
+   - Trigger: CSV of materials
+   - Action: Check each → Generate compliance matrix
+
+---
 
 ## Commands Reference
 
@@ -69,94 +159,35 @@ pytest backend/tests/                    # Backend tests
 # Document Ingestion
 python backend/ingest.py                 # Ingest PDFs from /data
 
+# MCP Server
+python -m backend.mcp_server             # Run MCP server locally
+
 # Azure Deployment
-gh workflow run infra-deploy.yml         # Deploy infrastructure
-git push origin main                      # Deploy app (auto)
+git push origin main                     # Auto-deploys via CI/CD
 ```
+
+---
 
 ## Environment Variables
 
 ```bash
-# Required (.env)
+# Required for production (.env)
 GOOGLE_API_KEY=xxx              # Google AI Studio
-PINECONE_API_KEY=xxx            # Pinecone
+PINECONE_API_KEY=xxx            # Pinecone Console
 PINECONE_INDEX_NAME=steel-index
 
 # Frontend (.env.local)
 NEXT_PUBLIC_API_URL=http://localhost:8000
 ```
 
-## Design System (Bittensor-Inspired)
-
-**Philosophy**: Clean, minimal, white background with black text.
-
-**Colors**:
-- Background: `#FFFFFF` (pure white)
-- Foreground: `#141414` (near black)
-- Muted: `#737373` (gray)
-- Yellow: `#D97706` (accent - use sparingly)
-- Border: `#EBEBEB` (subtle)
-
-**Typography**:
-- Section labels: `uppercase`, `tracking-[0.2em]`, `text-xs`
-- Navigation: `uppercase`, `tracking-[0.1em]`
-- Headings: `font-semibold`, `tracking-tight`
-
-**Spacing**:
-- Section padding: `py-16 sm:py-20 md:py-28 lg:py-32`
-- Container max-width: `max-w-5xl`
-
-## MCP Setup (Claude Code Integration)
-
-### Install MCP for Development
-
-Create `.mcp/config.json` in your home directory:
-
-```json
-{
-  "servers": {
-    "steelintelswa": {
-      "command": "npx",
-      "args": ["-y", "@anthropic/mcp-server-filesystem"],
-      "env": {
-        "ALLOWED_PATHS": "/path/to/knowledge_tool"
-      }
-    }
-  }
-}
-```
-
-### Available MCP Tools
-
-When using Claude Code with this project:
-
-1. **File Operations**: Read, write, edit project files
-2. **Bash**: Run npm, git, pytest commands
-3. **Browser**: Test frontend at localhost:3000
-4. **GitHub**: Create PRs, manage issues
-
-### Recommended Workflow
-
-```bash
-# Start the project
-claude "Start SteelIntel development servers"
-
-# Make changes
-claude "Update the search form placeholder text"
-
-# Run tests
-claude "Run all tests and fix any failures"
-
-# Deploy
-claude "Create a PR for the current changes"
-```
+---
 
 ## API Endpoints
 
 | Method | Endpoint | Request | Response |
 |--------|----------|---------|----------|
 | POST | `/api/chat` | `{ query: string }` | `{ response: string, sources: Source[] }` |
-| GET | `/health` | - | `{ status: string }` |
+| GET | `/health` | - | `{ status: string, version: string, mode: string }` |
 
 ### Source Citation Format
 
@@ -169,105 +200,138 @@ interface Source {
 }
 ```
 
+---
+
+## MVP Launch Checklist
+
+### Infrastructure (Manual Steps Required)
+- [ ] Create Azure Function App via Portal
+  - Name: `steel-agent-api`
+  - Runtime: Python 3.11
+  - Plan: Consumption (Serverless)
+- [ ] Add environment variables to Function App:
+  - `GOOGLE_API_KEY`
+  - `PINECONE_API_KEY`
+  - `PINECONE_INDEX_NAME=steel-index`
+- [ ] Download publish profile → Add to GitHub secrets as `AZURE_FUNCTIONAPP_PUBLISH_PROFILE`
+- [ ] Configure CORS:
+  - `https://red-flower-0152ee60f.1.azurestaticapps.net`
+  - `http://localhost:3000`
+
+### Data
+- [ ] Gather steel specification PDFs (ASTM, NACE, API)
+- [ ] Create Pinecone index (`steel-index`, 768 dims, cosine)
+- [ ] Run `python backend/ingest.py`
+
+### Verification
+```bash
+curl https://steel-agent-api.azurewebsites.net/health
+# Expected: {"status":"ok","version":"1.0.0","mode":"production"}
+```
+
+---
+
+## Coworker Onboarding
+
+### Project Overview
+Steel Knowledge Tool is an AI-powered RAG system for querying steel specifications and O&G compliance documents.
+
+**Tech Stack:**
+- Frontend: Next.js 16, TypeScript, Tailwind CSS
+- Backend: FastAPI, LangGraph, Google Gemini
+- Vector DB: Pinecone
+- Deployment: Azure (Static Web Apps + Functions)
+- Automation: MCP (Model Context Protocol)
+
+### First Steps
+1. Clone: `git clone https://github.com/davidfertube/knowledge_tool`
+2. Install: `npm install && pip install -r requirements.txt`
+3. Configure: Copy `.env.example` to `.env`, add API keys
+4. Run: `npm run dev` + `uvicorn backend.server:app --reload`
+
+### Questions for Discussion
+1. Do we have steel specification PDFs? (ASTM, NACE, API)
+2. Who has Azure portal access?
+3. Should we add user authentication for MVP?
+4. What compliance checks are priority? (NACE MR0175, hardness limits?)
+5. Do we need a custom domain?
+
+---
+
 ## Testing
 
 ### Frontend (Vitest)
 ```bash
 npm test                    # Run once
 npm test -- --watch         # Watch mode
-npm test -- --coverage      # Coverage report
 ```
 
 ### Backend (pytest)
 ```bash
 pytest backend/tests/           # All tests
 pytest backend/tests/ -v        # Verbose
-pytest backend/tests/ -k "test_retrieve"  # Specific test
 ```
 
-### Test Queries for PhD Demo
+### Test Queries
 
 1. "What is the yield strength of A106 Grade B?"
 2. "Does 4140 steel meet NACE MR0175 requirements?"
 3. "Compare A53 and A106 for high-temperature service"
 4. "Maximum allowable hardness for sour service?"
 
-## Azure Deployment
+---
 
-### Prerequisites
-- Azure account with subscription
-- GitHub repository access
-- API keys (Google AI, Pinecone)
+## Design System
 
-### Quick Deploy
+**Colors**:
+- Background: `#FFFFFF` (white)
+- Foreground: `#141414` (near black)
+- Muted: `#737373` (gray)
+- Yellow: `#D97706` (accent - use sparingly)
 
-1. **Configure Secrets** (GitHub → Settings → Secrets):
-   - `AZURE_CLIENT_ID`
-   - `AZURE_TENANT_ID`
-   - `AZURE_SUBSCRIPTION_ID`
-   - `GOOGLE_API_KEY`
-   - `PINECONE_API_KEY`
+**Typography**:
+- Section labels: `uppercase`, `tracking-[0.2em]`, `text-xs`
+- Headings: `font-semibold`, `tracking-tight`
 
-2. **Deploy Infrastructure**:
-   ```bash
-   gh workflow run infra-deploy.yml -f environment=dev
-   ```
+---
 
-3. **Deploy App** (automatic on push to main):
-   ```bash
-   git push origin main
-   ```
-
-See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed instructions.
-
-## Project Status
-
-### Completed
-- [x] Bittensor-inspired UI design
-- [x] Source citations with expandable previews
-- [x] Mobile-responsive layout
-- [x] Azure deployment infrastructure
-- [x] CI/CD pipelines
-- [x] Unit tests (frontend + backend)
-
-### Pending
-- [ ] Add PDF documents to /data
-- [ ] Run document ingestion
-- [ ] Deploy to Azure (live)
-- [ ] PhD demo validation
-
-## Debugging
+## Troubleshooting
 
 ### Backend Issues
 ```bash
-# Check if running
 curl http://localhost:8000/health
-
-# Check API keys
-python -c "import os; print(os.getenv('GOOGLE_API_KEY')[:5])"
-
-# Check Pinecone connection
-python -c "from pinecone import Pinecone; print(Pinecone().list_indexes())"
 ```
 
 ### Frontend Issues
 ```bash
-# Check API URL
 echo $NEXT_PUBLIC_API_URL
-
-# Test API call
-curl -X POST http://localhost:8000/api/chat \
-  -H "Content-Type: application/json" \
-  -d '{"query": "test"}'
 ```
 
 ### Common Fixes
-- **CORS errors**: Check backend CORS config in server.py
+- **CORS errors**: Check Function App CORS settings
 - **API timeout**: Increase timeout in lib/api.ts
-- **Build fails**: Clear `.next/` and rebuild
+- **Demo mode active**: Verify API keys are set
+
+---
+
+## Business Context
+
+### Value Proposition
+- Engineers spend 2-4 hours/day searching specs manually
+- Wrong material spec = potential $10M+ liability
+- Steel Knowledge Tool provides traceable, citable answers
+
+### Target Market
+- Tier 1: Major O&G (Shell, Chevron, ExxonMobil)
+- Tier 2: EPC Contractors (Fluor, Bechtel, KBR)
+- Tier 3: Engineering consultancies, inspection firms
+
+### Key Differentiator
+> "Not another AI chatbot - it's a compliance verification engine with traceable citations that engineers can cite in their reports."
+
+---
 
 ## Related Documentation
 
-- [TASKS.md](TASKS.md) - Implementation checklist
-- [DEPLOYMENT.md](DEPLOYMENT.md) - Azure deployment guide
+- [IMPLEMENTATION.md](IMPLEMENTATION.md) - Technical implementation guide
 - [README.md](README.md) - Project overview
