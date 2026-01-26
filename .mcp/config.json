@@ -3,7 +3,7 @@
   "servers": {
     "filesystem": {
       "command": "npx",
-      "args": ["-y", "@anthropic/mcp-server-filesystem", "/Users/david/.claude-worktrees/knowledge_tool/mystifying-keller"],
+      "args": ["-y", "@anthropic/mcp-server-filesystem", "."],
       "description": "File system access for SteelIntel project"
     },
     "github": {

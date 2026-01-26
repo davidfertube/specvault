@@ -123,4 +123,4 @@ git push origin main
 - **Frontend**: http://localhost:3000
 - **Backend**: http://localhost:8000
 - **Health Check**: http://localhost:8000/health
-- **GitHub**: https://github.com/davidfertube/knowledge_tool
+- **GitHub**: https://github.com/davidfertube/steel-venture

@@ -331,7 +331,7 @@ export default function Home() {
                 Docs
               </Link>
               <a
-                href="https://github.com/davidfertube/knowledge_tool"
+                href="https://github.com/davidfertube/steel-venture"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-sm text-black/60 hover:text-black transition-colors"
@@ -387,7 +387,7 @@ export default function Home() {
                 Docs
               </Link>
               <a
-                href="https://github.com/davidfertube/knowledge_tool"
+                href="https://github.com/davidfertube/steel-venture"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="block py-3 px-3 text-sm text-black/60 hover:text-black hover:bg-black/5 rounded transition-colors"
@@ -444,7 +444,7 @@ export default function Home() {
                   </Button>
                   <Button size="lg" variant="outline" className="border-black/20 bg-white text-black hover:bg-black/5 h-12 px-8" asChild>
                     <a
-                      href="https://github.com/davidfertube/knowledge_tool"
+                      href="https://github.com/davidfertube/steel-venture"
                       target="_blank"
                       rel="noopener noreferrer"
                     >
@@ -681,7 +681,7 @@ export default function Home() {
               <HealthIndicator />
               <Separator orientation="vertical" className="h-6 bg-black/10" />
               <a
-                href="https://github.com/davidfertube/knowledge_tool"
+                href="https://github.com/davidfertube/steel-venture"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-black/60 hover:text-black transition-colors"

@@ -34,8 +34,8 @@ AI-powered RAG application for querying steel specifications and oil & gas docum
 
 1. **Clone and install dependencies**
    ```bash
-   git clone https://github.com/davidfertube/knowledge_tool.git
-   cd knowledge_tool
+   git clone https://github.com/davidfertube/steel-venture.git
+   cd steel-venture
    npm install
    pip install -r requirements.txt
    ```

@@ -244,7 +244,7 @@ Steel Knowledge Tool is an AI-powered RAG system for querying steel specificatio
 - Automation: MCP (Model Context Protocol)
 
 ### First Steps
-1. Clone: `git clone https://github.com/davidfertube/knowledge_tool`
+1. Clone: `git clone https://github.com/davidfertube/steel-venture`
 2. Install: `npm install && pip install -r requirements.txt`
 3. Configure: Copy `.env.example` to `.env`, add API keys
 4. Run: `npm run dev` + `uvicorn backend.server:app --reload`
