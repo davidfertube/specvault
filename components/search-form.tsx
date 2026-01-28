@@ -18,6 +18,7 @@ const EXAMPLE_QUERIES = [
   "List the chemical composition requirements",
   "What are the hardness limits?",
   "Summarize the mechanical properties",
+  "What are the corrosion resistance properties?",
 ];
 
 export function SearchForm({ onResult, onError, onLoadingChange }: SearchFormProps) {

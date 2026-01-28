@@ -2,7 +2,7 @@
 
 import { useState, useCallback, FormEvent } from "react";
 import { motion } from "framer-motion";
-import { ArrowRight, Github, Menu, X, Boxes } from "lucide-react";
+import { ArrowRight, Github, Menu, X } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -456,9 +456,6 @@ export default function Home() {
 
             {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center gap-4 lg:gap-8">
-              <a href="#demo" className="text-sm text-black/60 hover:text-black transition-colors">
-                Demo
-              </a>
               <a
                 href="https://github.com/davidfertube/steel-venture"
                 target="_blank"
@@ -494,13 +491,6 @@ export default function Home() {
             className="md:hidden border-t border-black/5 bg-white"
           >
             <nav className="container-center py-6 space-y-1">
-              <a
-                href="#demo"
-                className="block py-3 px-3 text-sm text-black/60 hover:text-black hover:bg-black/5 rounded transition-colors"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Demo
-              </a>
               <a
                 href="https://github.com/davidfertube/steel-venture"
                 target="_blank"
@@ -832,9 +822,6 @@ export default function Home() {
         <div className="container-center">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-black flex items-center justify-center">
-                <Boxes className="w-4 h-4 text-white" />
-              </div>
               <div>
                 <span className="font-semibold text-black">Steel Agent</span>
                 <span className="text-black/60 text-sm ml-2">

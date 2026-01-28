@@ -158,6 +158,7 @@ describe('SearchForm', () => {
     expect(screen.getByText(/minimum tensile strength/i)).toBeInTheDocument();
     expect(screen.getByText(/chemical composition/i)).toBeInTheDocument();
     expect(screen.getByText(/hardness limits/i)).toBeInTheDocument();
+    expect(screen.getByText(/corrosion resistance/i)).toBeInTheDocument();
   });
 
   it('should fill input when clicking example query', async () => {
