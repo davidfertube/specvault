@@ -293,34 +293,20 @@ function IndustryVisualization() {
           transition={{ duration: 0.8, delay: 2 }}
         />
 
-        {/* "AI" text in center */}
+        {/* "STEEL AGENT" title above the brain circle */}
         <motion.text
           x={centerX}
-          y={centerY - 22}
-          fontSize="12"
+          y={centerY - 65}
+          fontSize="14"
           fill="#22c55e"
           fontWeight="bold"
           fontFamily="monospace"
           textAnchor="middle"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 2.2 }}
         >
-          STEEL
-        </motion.text>
-        <motion.text
-          x={centerX}
-          y={centerY - 10}
-          fontSize="12"
-          fill="#22c55e"
-          fontWeight="bold"
-          fontFamily="monospace"
-          textAnchor="middle"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 2.3 }}
-        >
-          AGENT
+          STEEL AGENT
         </motion.text>
 
         {/* Bottom label */}

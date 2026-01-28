@@ -98,8 +98,8 @@ export function DocumentUpload({ onUploadComplete }: DocumentUploadProps) {
       });
 
       if (!processResponse.ok) {
-        const errorData = await processResponse.json();
-        throw new Error(errorData.error || "Processing failed");
+        const errorData = await processResponse.json().catch(() => ({}));
+        throw new Error(errorData.error || "Processing failed. Please try again.");
       }
 
       // Update status to complete
