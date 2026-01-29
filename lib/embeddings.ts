@@ -15,9 +15,23 @@
 import { VoyageAIClient } from "voyageai";
 
 // Initialize Voyage AI client
+// Note: API key is validated at runtime to provide better error messages
 const voyageClient = new VoyageAIClient({
-  apiKey: process.env.VOYAGE_API_KEY,
+  apiKey: process.env.VOYAGE_API_KEY || "",
 });
+
+/**
+ * Validate that the Voyage API key is configured
+ * @throws Error if API key is missing
+ */
+function validateApiKey(): void {
+  if (!process.env.VOYAGE_API_KEY) {
+    throw new Error(
+      "VOYAGE_API_KEY environment variable is not set. " +
+      "Get a free API key at https://www.voyageai.com (200M tokens FREE/month)"
+    );
+  }
+}
 
 // Voyage embedding model - good quality, 1024 dimensions
 const EMBEDDING_MODEL = "voyage-3-lite";
@@ -56,6 +70,7 @@ function isRateLimitError(error: unknown): boolean {
  * @returns Vector embedding (array of 1024 numbers)
  */
 export async function generateEmbedding(text: string): Promise<number[]> {
+  validateApiKey();
   let lastError: Error | null = null;
 
   for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
@@ -95,6 +110,7 @@ export async function generateEmbedding(text: string): Promise<number[]> {
  * @returns Array of vector embeddings
  */
 export async function generateEmbeddings(texts: string[]): Promise<number[][]> {
+  validateApiKey();
   const BATCH_SIZE = 64; // Voyage supports up to 128, we use 64 for safety
   const embeddings: number[][] = [];
   const total = texts.length;

@@ -275,9 +275,15 @@ export function createEmbeddingError(error: unknown): SafeErrorResponse {
     const msg = error.message.toLowerCase();
 
     // API key configuration issues
+    if (msg.includes('voyage_api_key') || msg.includes('voyageai.com')) {
+      return {
+        error: 'Embedding service not configured. Please add VOYAGE_API_KEY to environment variables.',
+        code: 'SERVICE_UNAVAILABLE',
+      };
+    }
     if (msg.includes('api key') || msg.includes('api_key') || msg.includes('invalid key')) {
       return {
-        error: 'Document processing is temporarily unavailable. Please try again later or contact support.',
+        error: 'Document processing is temporarily unavailable. Please check API key configuration.',
         code: 'SERVICE_UNAVAILABLE',
       };
     }

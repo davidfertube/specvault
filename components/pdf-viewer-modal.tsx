@@ -18,14 +18,18 @@ export function PDFViewerModal({ source, isOpen, onClose }: PDFViewerModalProps)
   const [currentPage, setCurrentPage] = useState<number>(initialPage);
   const [loading, setLoading] = useState<boolean>(true);
 
-  // Build the PDF URL using our proxy endpoint
+  // Build the PDF URL - prioritize signed URL for better browser compatibility
   const getPdfUrl = useCallback(() => {
-    if (!source?.storage_path) {
-      // Fallback to document_url if no storage_path
-      return source?.document_url?.split("#")[0] || null;
+    // Prefer the direct signed URL from Supabase (better browser PDF rendering)
+    if (source?.document_url) {
+      // Remove any existing page anchor
+      return source.document_url.split("#")[0];
     }
-    // Use our proxy endpoint
-    return `/api/documents/pdf?path=${encodeURIComponent(source.storage_path)}`;
+    // Fallback to proxy endpoint if no direct URL
+    if (source?.storage_path) {
+      return `/api/documents/pdf?path=${encodeURIComponent(source.storage_path)}`;
+    }
+    return null;
   }, [source?.storage_path, source?.document_url]);
 
   const pdfUrl = getPdfUrl();
