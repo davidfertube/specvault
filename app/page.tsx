@@ -601,7 +601,7 @@ export default function Home() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: 1.0 }}
-                  className="grid grid-cols-2 sm:grid-cols-4 gap-6 pt-4 max-w-2xl mx-auto"
+                  className="grid grid-cols-2 gap-6 pt-4 max-w-md mx-auto"
                 >
                   <div>
                     <p className="text-2xl sm:text-3xl font-semibold text-black">4+ hrs</p>
@@ -610,14 +610,6 @@ export default function Home() {
                   <div>
                     <p className="text-2xl sm:text-3xl font-semibold text-black">100%</p>
                     <p className="text-sm text-black/60">Cited sources</p>
-                  </div>
-                  <div>
-                    <p className="text-2xl sm:text-3xl font-semibold text-black">&lt;5s</p>
-                    <p className="text-sm text-black/60">Response time</p>
-                  </div>
-                  <div>
-                    <p className="text-2xl sm:text-3xl font-semibold text-black">$0</p>
-                    <p className="text-sm text-black/60">Open source</p>
                   </div>
                 </motion.div>
               </div>

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
-import { generateEmbeddings } from "@/lib/embeddings";
+import { generateEmbeddingsParallel } from "@/lib/embeddings";
 import { storeChunks } from "@/lib/vectorstore";
 import { extractText } from "unpdf";
 import { handleApiError, createValidationError, createEmbeddingError, getErrorStatusCode } from "@/lib/errors";
@@ -217,7 +217,8 @@ export async function POST(request: NextRequest) {
     // ========================================
     // Step 6: Chunk the Text
     // ========================================
-    const textChunks = chunkText(text);
+    // Use larger chunks (2000 chars) to reduce total chunks and speed up processing
+    const textChunks = chunkText(text, 2000, 300);
 
     if (textChunks.length === 0) {
       console.error("[Process API] No valid chunks generated from document:", documentId);
@@ -235,7 +236,8 @@ export async function POST(request: NextRequest) {
     // ========================================
     let embeddings: number[][];
     try {
-      embeddings = await generateEmbeddings(textChunks);
+      // Use parallel embedding with batch size 10 for faster processing
+      embeddings = await generateEmbeddingsParallel(textChunks, 10);
     } catch (embeddingError) {
       console.error("[Process API] Embedding generation failed:", embeddingError);
       await updateDocumentStatus(documentId, "error");
