@@ -618,16 +618,16 @@ export default function Home() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
-              className="space-y-12"
+              className="space-y-16" // Increased spacing
             >
               {/* Section Header */}
-              <div className="text-center space-y-4">
+              <div className="text-center space-y-6">
                 <motion.h2
                   initial={{ opacity: 0, y: 10 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: 0.1 }}
-                  className="text-3xl sm:text-4xl md:text-5xl font-semibold tracking-tight text-black"
+                  className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-black"
                 >
                   Why Spec Agents?
                 </motion.h2>
@@ -636,31 +636,35 @@ export default function Home() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: 0.2 }}
-                  className="text-lg text-black/70 max-w-2xl mx-auto"
+                  className="text-xl text-black/60 max-w-3xl mx-auto leading-relaxed"
                 >
-                  Generic LLMs (ChatGPT, Claude, Gemini) hallucinate specs. Spec Agents only answers from your documents.
+                  Generic LLMs (ChatGPT, Claude, Gemini) hallucinate specs. <br className="hidden sm:block" />
+                  Spec Agents only answers from <span className="text-black font-semibold">your documents</span>.
                 </motion.p>
               </div>
 
               {/* Comparison Grid */}
-              <div className="grid md:grid-cols-2 gap-4 sm:gap-6 max-w-4xl mx-auto">
+              <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto px-4">
                 {/* Spec Agents Card */}
                 <motion.div
                   initial={{ opacity: 0, x: -20 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: 0.3 }}
-                  className="rounded-xl border-2 border-green-500 bg-green-50/50 p-4 sm:p-6 space-y-3 sm:space-y-4"
+                  className="rounded-2xl border border-green-200 bg-green-50/50 p-8 space-y-8 hover:shadow-lg transition-shadow duration-300"
                 >
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center">
-                      <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  <div className="flex flex-col items-center text-center gap-4">
+                    <div className="w-16 h-16 rounded-full bg-green-500 flex items-center justify-center shadow-lg shadow-green-500/20">
+                      <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                       </svg>
                     </div>
-                    <h3 className="text-xl font-semibold text-green-700">Spec Agents</h3>
+                    <div>
+                      <h3 className="text-2xl font-bold text-green-700">Spec Agents</h3>
+                      <p className="text-sm text-green-600/80 font-medium mt-1">Trustworthy & Traceable</p>
+                    </div>
                   </div>
-                  <ul className="space-y-3">
+                  <ul className="space-y-4">
                     {[
                       "Every answer traceable to page & document",
                       "Audit-ready for ISO/API/ASTM compliance",
@@ -675,12 +679,14 @@ export default function Home() {
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true }}
                         transition={{ delay: 0.4 + i * 0.05 }}
-                        className="flex items-start gap-2"
+                        className="flex items-start gap-3"
                       >
-                        <svg className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                        </svg>
-                        <span className="text-sm text-black/80">{item}</span>
+                        <div className="mt-1 flex-shrink-0 w-5 h-5 rounded-full bg-green-200 flex items-center justify-center">
+                          <svg className="w-3.5 h-3.5 text-green-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                          </svg>
+                        </div>
+                        <span className="text-base text-black/80 font-medium">{item}</span>
                       </motion.li>
                     ))}
                   </ul>
@@ -692,18 +698,22 @@ export default function Home() {
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: 0.4 }}
-                  className="rounded-xl border-2 border-red-300 bg-red-50/30 p-4 sm:p-6 space-y-3 sm:space-y-4"
+                  className="rounded-2xl border border-red-200 bg-red-50/30 p-8 space-y-8 hover:shadow-lg transition-shadow duration-300"
                 >
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-red-400 flex items-center justify-center">
-                      <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  <div className="flex flex-col items-center text-center gap-4">
+                    <div className="w-16 h-16 rounded-full bg-red-400 flex items-center justify-center shadow-lg shadow-red-400/20">
+                      <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
                       </svg>
                     </div>
-                    <h3 className="text-xl font-semibold text-red-600">Generic LLM</h3>
-                    <span className="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full">ChatGPT / Claude / Gemini</span>
+                    <div>
+                      <h3 className="text-2xl font-bold text-red-600">Generic LLM</h3>
+                      <div className="mt-2 inline-block px-3 py-1 bg-red-100 text-red-600 text-xs font-semibold rounded-full">
+                        ChatGPT / Claude / Gemini
+                      </div>
+                    </div>
                   </div>
-                  <ul className="space-y-3">
+                  <ul className="space-y-4">
                     {[
                       "No source citations",
                       "Not acceptable for audits",
@@ -718,12 +728,14 @@ export default function Home() {
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true }}
                         transition={{ delay: 0.5 + i * 0.05 }}
-                        className="flex items-start gap-2"
+                        className="flex items-start gap-3"
                       >
-                        <svg className="w-5 h-5 text-red-400 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                        <span className="text-sm text-black/60">{item}</span>
+                        <div className="mt-1 flex-shrink-0 w-5 h-5 rounded-full bg-red-100 flex items-center justify-center">
+                          <svg className="w-3.5 h-3.5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </div>
+                        <span className="text-base text-black/60">{item}</span>
                       </motion.li>
                     ))}
                   </ul>
@@ -736,45 +748,57 @@ export default function Home() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: 0.6 }}
-                className="bg-white rounded-xl border border-black/10 p-6 max-w-3xl mx-auto"
+                className="bg-white rounded-2xl border border-black/5 shadow-xl shadow-black/5 p-8 md:p-10 max-w-4xl mx-auto"
               >
-                <p className="text-sm text-black/50 mb-4 text-center">Example Question</p>
-                <p className="text-lg font-medium text-black text-center mb-6">
-                  &quot;What is the yield strength of 316L stainless steel?&quot;
-                </p>
-                <div className="grid md:grid-cols-2 gap-6">
+                <div className="text-center mb-8">
+                  <span className="text-xs font-semibold tracking-wider text-black/40 uppercase">Live Comparison</span>
+                  <h4 className="text-2xl font-bold text-black mt-2">
+                    &quot;What is the yield strength of 316L stainless steel?&quot;
+                  </h4>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-8">
                   {/* Spec Agents Response */}
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-2">
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-center gap-2">
                       <div className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center">
-                        <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                         </svg>
                       </div>
-                      <span className="text-sm font-semibold text-green-700">Spec Agents</span>
+                      <span className="font-bold text-green-700">Spec Agents</span>
                     </div>
-                    <div className="bg-green-50 rounded-lg p-4 text-sm">
-                      <p className="text-black/80">&quot;The minimum yield strength of 316L is <strong>170 MPa (25 ksi)</strong> [1]&quot;</p>
-                      <p className="text-green-600 text-xs mt-2 font-medium">
+                    <div className="bg-green-50 rounded-xl p-5 border border-green-100 relative">
+                      <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-green-50 border-t border-l border-green-100 rotate-45 transform"></div>
+                      <p className="text-black/90 text-lg">&quot;The minimum yield strength of 316L is <strong className="bg-green-200/50 px-1 rounded">170 MPa (25 ksi)</strong> [1]&quot;</p>
+                      <div className="mt-3 flex items-center gap-2 text-xs font-medium text-green-700 bg-white/50 p-2 rounded-lg border border-green-100">
+                        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
                         Source: ASTM_A240.pdf, Page 3
-                      </p>
+                      </div>
                     </div>
                   </div>
+
                   {/* Generic LLM Response */}
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-2">
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-center gap-2">
                       <div className="w-6 h-6 rounded-full bg-red-400 flex items-center justify-center">
-                        <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                         </svg>
                       </div>
-                      <span className="text-sm font-medium text-red-600">Generic LLM</span>
+                      <span className="font-bold text-red-600">Generic LLM</span>
                     </div>
-                    <div className="bg-red-50/50 rounded-lg p-4 text-sm">
-                      <p className="text-black/60">&quot;316L stainless steel typically has a yield strength around 170-290 MPa...&quot;</p>
-                      <p className="text-red-400 text-xs mt-2">
+                    <div className="bg-red-50/50 rounded-xl p-5 border border-red-100 relative">
+                      <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-red-50/50 border-t border-l border-red-100 rotate-45 transform"></div>
+                      <p className="text-black/60 italic">&quot;316L stainless steel typically has a yield strength around 170-290 MPa...&quot;</p>
+                      <div className="mt-3 flex items-center gap-2 text-xs font-medium text-red-500 bg-white/50 p-2 rounded-lg border border-red-100">
+                        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
                         No source • Cannot verify
-                      </p>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -846,9 +870,8 @@ export default function Home() {
                   {/* Search Area - Animated when upload completes */}
                   <motion.div
                     ref={step2Ref}
-                    className={`space-y-4 p-4 -m-4 rounded-xl transition-all duration-500 ${
-                      hasDocumentUploaded ? 'bg-green-50 ring-2 ring-green-500 ring-offset-2' : ''
-                    }`}
+                    className={`space-y-4 p-4 -m-4 rounded-xl transition-all duration-500 ${hasDocumentUploaded ? 'bg-green-50 ring-2 ring-green-500 ring-offset-2' : ''
+                      }`}
                     animate={hasDocumentUploaded ? {
                       scale: [1, 1.03, 1],
                       transition: { duration: 0.6, ease: "easeOut" }
@@ -856,9 +879,8 @@ export default function Home() {
                   >
                     <div className="flex items-center gap-3">
                       <motion.span
-                        className={`flex items-center justify-center w-8 h-8 rounded-full text-white text-sm font-bold transition-colors duration-300 ${
-                          hasDocumentUploaded ? 'bg-green-500' : 'bg-black'
-                        }`}
+                        className={`flex items-center justify-center w-8 h-8 rounded-full text-white text-sm font-bold transition-colors duration-300 ${hasDocumentUploaded ? 'bg-green-500' : 'bg-black'
+                          }`}
                         animate={hasDocumentUploaded ? {
                           scale: [1, 1.3, 1],
                           transition: { duration: 0.5, repeat: 3 }
@@ -866,9 +888,8 @@ export default function Home() {
                       >
                         2
                       </motion.span>
-                      <h3 className={`text-lg font-semibold transition-colors duration-300 ${
-                        hasDocumentUploaded ? 'text-green-700' : 'text-black'
-                      }`}>
+                      <h3 className={`text-lg font-semibold transition-colors duration-300 ${hasDocumentUploaded ? 'text-green-700' : 'text-black'
+                        }`}>
                         {hasDocumentUploaded ? "Now Ask a Question!" : "Ask a Question"}
                       </h3>
                       {hasDocumentUploaded && (
