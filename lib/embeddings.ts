@@ -14,23 +14,28 @@
 
 import { VoyageAIClient } from "voyageai";
 
-// Initialize Voyage AI client
-// Note: API key is validated at runtime to provide better error messages
-const voyageClient = new VoyageAIClient({
-  apiKey: process.env.VOYAGE_API_KEY || "",
-});
+// Lazy-initialized Voyage AI client
+// IMPORTANT: Must use lazy init to ensure env var is read at request time, not module load time
+let voyageClient: VoyageAIClient | null = null;
 
 /**
- * Validate that the Voyage API key is configured
- * @throws Error if API key is missing
+ * Get or create the Voyage AI client
+ * Uses lazy initialization to ensure env var is read at request time
+ * This is critical for serverless environments like Vercel
  */
-function validateApiKey(): void {
-  if (!process.env.VOYAGE_API_KEY) {
-    throw new Error(
-      "VOYAGE_API_KEY environment variable is not set. " +
-      "Get a free API key at https://www.voyageai.com (200M tokens FREE/month)"
-    );
+function getVoyageClient(): VoyageAIClient {
+  if (!voyageClient) {
+    if (!process.env.VOYAGE_API_KEY) {
+      throw new Error(
+        "VOYAGE_API_KEY environment variable is not set. " +
+        "Get a free API key at https://www.voyageai.com (200M tokens FREE/month)"
+      );
+    }
+    voyageClient = new VoyageAIClient({
+      apiKey: process.env.VOYAGE_API_KEY,
+    });
   }
+  return voyageClient;
 }
 
 // Voyage embedding model - good quality, 1024 dimensions
@@ -70,12 +75,12 @@ function isRateLimitError(error: unknown): boolean {
  * @returns Vector embedding (array of 1024 numbers)
  */
 export async function generateEmbedding(text: string): Promise<number[]> {
-  validateApiKey();
+  const client = getVoyageClient();
   let lastError: Error | null = null;
 
   for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
     try {
-      const result = await voyageClient.embed({
+      const result = await client.embed({
         input: [text],
         model: EMBEDDING_MODEL,
       });
@@ -110,7 +115,7 @@ export async function generateEmbedding(text: string): Promise<number[]> {
  * @returns Array of vector embeddings
  */
 export async function generateEmbeddings(texts: string[]): Promise<number[][]> {
-  validateApiKey();
+  const client = getVoyageClient();
   const BATCH_SIZE = 64; // Voyage supports up to 128, we use 64 for safety
   const embeddings: number[][] = [];
   const total = texts.length;
@@ -125,7 +130,7 @@ export async function generateEmbeddings(texts: string[]): Promise<number[][]> {
 
     for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
       try {
-        const result = await voyageClient.embed({
+        const result = await client.embed({
           input: batch,
           model: EMBEDDING_MODEL,
         });

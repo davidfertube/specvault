@@ -12,6 +12,7 @@ import { ResponseDisplay } from "@/components/response-display";
 import { RealtimeComparison } from "@/components/realtime-comparison";
 import { DocumentUpload } from "@/components/document-upload";
 import { Source, GenericLLMResponse } from "@/lib/api";
+import { PipelineVisualization } from "@/components/pipeline-visualization";
 
 // Spline 3D Animation Component
 // Shows PDFs flowing into the Spec Agents brain
@@ -1195,19 +1196,19 @@ export default function Home() {
                 </div>
               </motion.div>
 
-              {/* Right Column: 3D Animation */}
+              {/* Right Column: Visualization */}
               <motion.div
                 initial={{ opacity: 0, x: 20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.8, delay: 0.2 }}
-                className="flex-1 w-full hidden lg:block"
+                className="flex-1 w-full hidden lg:flex items-center justify-center"
               >
                 <div className="relative">
                   {/* Decorative background element */}
                   <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-blue-50/50 rounded-full blur-3xl -z-10" />
                   {/* Processing Pipeline Animation */}
-                  <ProcessingPipelineAnimation />
+                  <PipelineVisualization />
                 </div>
               </motion.div>
             </div>
