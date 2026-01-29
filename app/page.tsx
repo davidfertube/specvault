@@ -1186,7 +1186,7 @@ export default function Home() {
                     Get Priority Access
                   </h2>
                   <p className="text-lg text-black/70 leading-relaxed">
-                    Be the first to automate your compliance reviews with AI that cites its sources.
+                    Be the first to automate your compliance reviews with AI.
                   </p>
                 </div>
 
