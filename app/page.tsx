@@ -469,7 +469,7 @@ function LeadForm() {
                 required
                 disabled={isSubmitting}
                 className="w-full h-11 px-4 border border-black/20 rounded focus:outline-none focus:ring-2 focus:ring-black/20 focus:border-black transition-colors disabled:opacity-50"
-                placeholder="John"
+                placeholder=""
               />
             </div>
             <div className="space-y-2">
@@ -483,7 +483,7 @@ function LeadForm() {
                 required
                 disabled={isSubmitting}
                 className="w-full h-11 px-4 border border-black/20 rounded focus:outline-none focus:ring-2 focus:ring-black/20 focus:border-black transition-colors disabled:opacity-50"
-                placeholder="Doe"
+                placeholder=""
               />
             </div>
           </div>
@@ -499,7 +499,7 @@ function LeadForm() {
               required
               disabled={isSubmitting}
               className="w-full h-11 px-4 border border-black/20 rounded focus:outline-none focus:ring-2 focus:ring-black/20 focus:border-black transition-colors disabled:opacity-50"
-              placeholder="john.doe@company.com"
+              placeholder=""
             />
           </div>
 
@@ -513,7 +513,7 @@ function LeadForm() {
               name="company"
               disabled={isSubmitting}
               className="w-full h-11 px-4 border border-black/20 rounded focus:outline-none focus:ring-2 focus:ring-black/20 focus:border-black transition-colors disabled:opacity-50"
-              placeholder="Shell, ExxonMobil, Bechtel..."
+              placeholder=""
             />
           </div>
 
@@ -527,7 +527,7 @@ function LeadForm() {
               name="phone"
               disabled={isSubmitting}
               className="w-full h-11 px-4 border border-black/20 rounded focus:outline-none focus:ring-2 focus:ring-black/20 focus:border-black transition-colors disabled:opacity-50"
-              placeholder="+1 (555) 123-4567"
+              placeholder=""
             />
           </div>
 
@@ -1186,7 +1186,7 @@ export default function Home() {
                     Get Priority Access
                   </h2>
                   <p className="text-lg text-black/70 leading-relaxed">
-                    Join 500+ material engineers already on the waitlist. Be the first to automate your compliance reviews with AI that cites its sources.
+                    Be the first to automate your compliance reviews with AI that cites its sources.
                   </p>
                 </div>
 
