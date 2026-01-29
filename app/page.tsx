@@ -12,6 +12,7 @@ import { ResponseDisplay } from "@/components/response-display";
 import { RealtimeComparison } from "@/components/realtime-comparison";
 import { DocumentUpload } from "@/components/document-upload";
 import { Source, GenericLLMResponse } from "@/lib/api";
+import { Result3DAnimation } from "@/components/result-3d-animation";
 
 // Spline 3D Animation Component
 // Shows PDFs flowing into the Spec Agents brain
