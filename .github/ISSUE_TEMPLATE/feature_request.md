@@ -1,6 +1,6 @@
 ---
 name: Feature Request
-about: Suggest a new feature for Steel Venture
+about: Suggest a new feature for Spec Agents
 title: '[FEATURE] '
 labels: 'enhancement'
 assignees: ''

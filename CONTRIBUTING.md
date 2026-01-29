@@ -1,6 +1,6 @@
-# Contributing to Steel Venture
+# Contributing to Spec Agents
 
-Thank you for your interest in contributing to Steel Venture! This document provides guidelines and instructions for contributing.
+Thank you for your interest in contributing to Spec Agents! This document provides guidelines and instructions for contributing.
 
 ## Table of Contents
 
