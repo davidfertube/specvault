@@ -54,7 +54,7 @@ This guide walks you through deploying Spec Agents to **Vercel** with **Supabase
 
 Click this button to deploy:
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/davidfertube/steel-venture)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/davidfertube/spec-agents)
 
 This will:
 1. Fork the repository to your GitHub account
@@ -130,7 +130,7 @@ vercel login
 
 ```bash
 # From project root
-cd /Users/david/Downloads/repos/steel-venture
+cd /Users/david/Downloads/repos/spec-agents
 
 # Deploy to production
 vercel --prod

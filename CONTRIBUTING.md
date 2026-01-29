@@ -15,7 +15,7 @@ Thank you for your interest in contributing to Steel Venture! This document prov
 ## Quick Start
 
 1. Fork the repository
-2. Clone your fork: `git clone https://github.com/YOUR_USERNAME/steel-venture`
+2. Clone your fork: `git clone https://github.com/YOUR_USERNAME/spec-agents`
 3. Install dependencies: `npm install`
 4. Copy environment file: `cp .env.example .env.local`
 5. Start development: `npm run dev`
@@ -170,8 +170,8 @@ Use the [Feature Request Template](.github/ISSUE_TEMPLATE/feature_request.md).
 
 ## Questions?
 
-- Open a [Discussion](https://github.com/davidfertube/steel-venture/discussions)
-- Check existing [Issues](https://github.com/davidfertube/steel-venture/issues)
+- Open a [Discussion](https://github.com/davidfertube/spec-agents/discussions)
+- Check existing [Issues](https://github.com/davidfertube/spec-agents/issues)
 - Read the [Documentation](README.md)
 
 Thank you for contributing!

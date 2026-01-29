@@ -77,7 +77,7 @@ npm run dev
 ## 🌐 VERCEL DEPLOYMENT (One-Click Deploy)
 
 ### Option 1: Deploy with Vercel Button
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/davidfertube/steel-venture)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/davidfertube/spec-agents)
 
 ### Option 2: Manual Deploy
 ```bash
@@ -124,7 +124,7 @@ vercel
 
 - **Frontend & API**: http://localhost:3000
 - **API Routes**: http://localhost:3000/api/chat
-- **GitHub**: https://github.com/davidfertube/steel-venture
+- **GitHub**: https://github.com/davidfertube/spec-agents
 - **Supabase Dashboard**: https://supabase.com/dashboard
 
 ---

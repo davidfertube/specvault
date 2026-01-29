@@ -474,7 +474,7 @@ export default function Home() {
                 Contact
               </a>
               <a
-                href="https://github.com/davidfertube/steel-venture"
+                href="https://github.com/davidfertube/spec-agents"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-sm text-black/60 hover:text-black transition-colors"
@@ -522,7 +522,7 @@ export default function Home() {
                 Contact
               </a>
               <a
-                href="https://github.com/davidfertube/steel-venture"
+                href="https://github.com/davidfertube/spec-agents"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="block py-3 px-3 text-sm text-black/60 hover:text-black hover:bg-black/5 rounded transition-colors"
@@ -1050,7 +1050,7 @@ export default function Home() {
             </div>
             <div className="flex items-center gap-6">
               <a
-                href="https://github.com/davidfertube/steel-venture"
+                href="https://github.com/davidfertube/spec-agents"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-black/60 hover:text-black transition-colors"

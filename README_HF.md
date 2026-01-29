@@ -42,7 +42,7 @@ An AI-powered RAG (Retrieval-Augmented Generation) application for querying stee
 
 ## Links
 
-- [GitHub Repository](https://github.com/davidfertube/steel-venture)
+- [GitHub Repository](https://github.com/davidfertube/spec-agents)
 - [Live Demo](https://red-flower-0152ee60f.1.azurestaticapps.net)
 
 ## License

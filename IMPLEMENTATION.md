@@ -32,7 +32,7 @@ This document provides technical details for implementing and extending Spec Age
 ## Key Files & Directories
 
 ```
-/Users/david/Downloads/repos/steel-venture/
+/Users/david/Downloads/repos/spec-agents/
 ├── app/
 │   ├── page.tsx                          # Main landing page
 │   ├── layout.tsx                        # Root layout with providers
@@ -338,7 +338,7 @@ npx tsx scripts/evaluate-accuracy.ts --json > results.json
 ### Vercel (Recommended)
 
 **One-Click Deploy:**
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/davidfertube/steel-venture)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/davidfertube/spec-agents)
 
 **Manual Deploy:**
 ```bash
