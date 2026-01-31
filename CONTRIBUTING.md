@@ -34,7 +34,8 @@ Copy `.env.example` to `.env.local` and configure:
 
 ```bash
 # Required for full functionality
-GOOGLE_API_KEY=your_google_api_key
+VOYAGE_API_KEY=your_voyage_api_key      # Voyage AI embeddings
+GROQ_API_KEY=your_groq_api_key          # Groq LLM
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 ```

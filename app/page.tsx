@@ -681,6 +681,12 @@ export default function Home() {
             {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center gap-4 lg:gap-8">
               <a
+                href="#why"
+                className="text-sm text-black/60 hover:text-black transition-colors"
+              >
+                Why
+              </a>
+              <a
                 href="#demo"
                 className="text-sm text-black/60 hover:text-black transition-colors"
               >
@@ -718,6 +724,13 @@ export default function Home() {
             className="md:hidden border-t border-black/5 bg-white"
           >
             <nav className="container-center py-6 space-y-1">
+              <a
+                href="#why"
+                className="block py-3 px-3 text-sm text-black/60 hover:text-black hover:bg-black/5 rounded transition-colors"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Why
+              </a>
               <a
                 href="#demo"
                 className="block py-3 px-3 text-sm text-black/60 hover:text-black hover:bg-black/5 rounded transition-colors"
@@ -832,7 +845,7 @@ export default function Home() {
         </section>
 
         {/* Why Spec Agents vs Generic LLMs Section */}
-        <section className="relative py-12 sm:py-16 md:py-20 border-t border-black/5 bg-black/[0.02]">
+        <section id="why" className="relative py-12 sm:py-16 md:py-20 border-t border-black/5 bg-black/[0.02]">
           <div className="container-center">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
