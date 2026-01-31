@@ -1,0 +1,144 @@
+{
+  "metadata": {
+    "version": "1.0",
+    "created": "2026-01-30",
+    "description": "Cross-specification confusion tests: A789 (Tubing) vs A790 (Pipe)",
+    "critical_differences": {
+      "A789": "Seamless and Welded Ferritic/Austenitic Stainless Steel TUBING for General Service",
+      "A790": "Seamless and Welded Ferritic/Austenitic Stainless Steel PIPE",
+      "yield_difference": "A789 S32205 = 70 ksi [485 MPa], A790 S32205 = 65 ksi [450 MPa]",
+      "supplementary": "A789 has S1 only (Pneumatic Test), A790 has S1-S4"
+    }
+  },
+  "testCases": [
+    {
+      "id": "CONF-001",
+      "query": "What is the yield strength of S32205 duplex tubing per ASTM A789?",
+      "expectedPatterns": ["70\\s*ksi|485\\s*MPa"],
+      "forbiddenPatterns": ["65\\s*ksi|450\\s*MPa"],
+      "requiredCitations": ["A789"],
+      "category": "lookup",
+      "categoryLetter": "A",
+      "documents": ["A789"],
+      "difficulty": "medium",
+      "notes": "A789 yield is 70 ksi - NOT 65 ksi like A790. Most critical confusion test.",
+      "trap": "System must not return A790 value (65 ksi) when asked about A789"
+    },
+    {
+      "id": "CONF-002",
+      "query": "What is the yield strength of S32205 duplex pipe per ASTM A790?",
+      "expectedPatterns": ["65\\s*ksi|450\\s*MPa"],
+      "forbiddenPatterns": ["70\\s*ksi|485\\s*MPa"],
+      "requiredCitations": ["A790"],
+      "category": "lookup",
+      "categoryLetter": "A",
+      "documents": ["A790"],
+      "difficulty": "medium",
+      "notes": "A790 yield is 65 ksi - NOT 70 ksi like A789. Inverse of CONF-001.",
+      "trap": "System must not return A789 value (70 ksi) when asked about A790"
+    },
+    {
+      "id": "CONF-003",
+      "query": "Compare the yield strength of S32205 in A789 tubing vs A790 pipe specifications",
+      "expectedPatterns": ["A789.*70\\s*ksi|485\\s*MPa", "A790.*65\\s*ksi|450\\s*MPa", "tubing|pipe"],
+      "requiredCitations": ["A789", "A790"],
+      "category": "comparison",
+      "categoryLetter": "C",
+      "documents": ["A789", "A790"],
+      "difficulty": "hard",
+      "notes": "Must correctly identify BOTH values with correct spec attribution",
+      "trap": "Must cite both specs with correct values - not mix them up"
+    },
+    {
+      "id": "CONF-004",
+      "query": "What supplementary requirements are available in A789?",
+      "expectedPatterns": ["S1|pneumatic"],
+      "forbiddenPatterns": ["S2|S3|S4|charpy|impact|magnetic"],
+      "requiredCitations": ["A789"],
+      "category": "list",
+      "categoryLetter": "B",
+      "documents": ["A789"],
+      "difficulty": "medium",
+      "notes": "A789 only has S1 (Pneumatic Test) - NOT S1-S4 like A790",
+      "trap": "Must not list S2, S3, S4 which are only in A790"
+    },
+    {
+      "id": "CONF-005",
+      "query": "Does ASTM A789 include repair welding procedures?",
+      "expectedPatterns": ["no|not\\s+included|not\\s+cover|no\\s+section\\s*15"],
+      "forbiddenPatterns": ["Section\\s*15|repair.*permitted|manufacturer.*approval"],
+      "requiredCitations": ["A789"],
+      "category": "refusal",
+      "categoryLetter": "E",
+      "documents": ["A789"],
+      "difficulty": "hard",
+      "notes": "A789 has NO Section 15 - A790 does. Should refuse or clarify absence.",
+      "trap": "Must not cite A790's Section 15 welding info for A789 question"
+    },
+    {
+      "id": "CONF-006",
+      "query": "What product form does A789 cover?",
+      "expectedPatterns": ["tubing|tube"],
+      "forbiddenPatterns": ["\\bpipe\\b"],
+      "requiredCitations": ["A789"],
+      "category": "lookup",
+      "categoryLetter": "B",
+      "documents": ["A789"],
+      "difficulty": "easy",
+      "notes": "A789 covers TUBING, A790 covers PIPE - fundamental distinction",
+      "trap": "Must not say 'pipe' for A789 scope"
+    },
+    {
+      "id": "CONF-007",
+      "query": "What ASTM standards are referenced by A789?",
+      "expectedPatterns": ["A480|A1016|E527"],
+      "forbiddenPatterns": ["A370|A923|A999"],
+      "requiredCitations": ["A789"],
+      "category": "list",
+      "categoryLetter": "B",
+      "documents": ["A789"],
+      "difficulty": "hard",
+      "notes": "A789 references A480, A1016, E527 - NOT A370, A923, A999 (those are A790)",
+      "trap": "Must not confuse referenced standards between A789 and A790"
+    },
+    {
+      "id": "CONF-008",
+      "query": "What is the tensile strength of S32003 per A789?",
+      "expectedPatterns": ["100\\s*ksi|690\\s*MPa"],
+      "forbiddenPatterns": ["95\\s*ksi|655\\s*MPa"],
+      "requiredCitations": ["A789"],
+      "category": "lookup",
+      "categoryLetter": "A",
+      "documents": ["A789"],
+      "difficulty": "hard",
+      "notes": "A789 S32003 tensile = 100 ksi [690 MPa], A790 S32003 tensile = 95 ksi [655 MPa]",
+      "trap": "Another grade with different values between A789 and A790"
+    },
+    {
+      "id": "CONF-009",
+      "query": "What dimensional tolerances apply to A789 tubing?",
+      "expectedPatterns": ["OD|outside\\s*diameter|wall\\s*thickness|tubing"],
+      "forbiddenPatterns": ["NPS|nominal\\s*pipe\\s*size|schedule\\s*40|schedule\\s*80"],
+      "requiredCitations": ["A789"],
+      "category": "lookup",
+      "categoryLetter": "D",
+      "documents": ["A789"],
+      "difficulty": "medium",
+      "notes": "A789 uses OD/wall thickness tolerances for tubing, NOT NPS/schedules",
+      "trap": "Must not mention pipe schedules (NPS) which are A790 terminology"
+    },
+    {
+      "id": "CONF-010",
+      "query": "What is the yield strength of S32304 lean duplex per A789 for OD less than or equal to 1 inch?",
+      "expectedPatterns": ["65\\s*ksi|450\\s*MPa"],
+      "forbiddenPatterns": ["58\\s*ksi|400\\s*MPa"],
+      "requiredCitations": ["A789"],
+      "category": "lookup",
+      "categoryLetter": "A",
+      "documents": ["A789"],
+      "difficulty": "hard",
+      "notes": "A789 has SIZE-DEPENDENT yield for S32304: <=1\" OD = 65 ksi, >1\" OD = 58 ksi",
+      "trap": "A790 only has 58 ksi for S32304 - no size dependency"
+    }
+  ]
+}

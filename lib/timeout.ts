@@ -90,8 +90,8 @@ export async function withTimeout<T>(
  * - FILE_UPLOAD: Large PDFs (50MB) can take time, allow 60s
  */
 export const TIMEOUTS = {
-  /** Timeout for LLM response generation (30 seconds) */
-  LLM_GENERATION: 30000,
+  /** Timeout for LLM response generation (60 seconds - prioritize accuracy over speed) */
+  LLM_GENERATION: 60000,
 
   /** Timeout for generating a single embedding (10 seconds) */
   EMBEDDING_SINGLE: 10000,
@@ -99,11 +99,14 @@ export const TIMEOUTS = {
   /** Timeout for database queries (5 seconds) */
   DATABASE_QUERY: 5000,
 
-  /** Timeout for vector similarity search (5 seconds) */
-  VECTOR_SEARCH: 5000,
+  /** Timeout for vector similarity search (15 seconds) */
+  VECTOR_SEARCH: 15000,
 
   /** Timeout for file uploads (60 seconds) */
   FILE_UPLOAD: 60000,
+
+  /** Timeout for multi-query RAG pipeline (75 seconds - allow full pipeline for accuracy) */
+  MULTI_QUERY_RAG: 75000,
 } as const;
 
 /**

@@ -1,0 +1,2241 @@
+{
+  "metadata": {
+    "version": "1.0",
+    "created": "2026-01-30",
+    "description": "Comprehensive test suite: 31 queries per document (10 easy + 10 medium + 10 difficult + 1 edge case)",
+    "total_queries": 341,
+    "documents": 11
+  },
+  "documents": {
+    "ASTM-A790-2024": {
+      "filename": "897102004-ASTM-A790-A790M-24.pdf",
+      "description": "Seamless and Welded Ferritic/Austenitic Stainless Steel Pipe (2024 Edition)",
+      "queries": {
+        "easy": [
+          {
+            "id": "A790-24-E01",
+            "query": "What is the scope of ASTM A790?",
+            "expectedPatterns": ["pipe", "seamless|welded", "ferritic.*austenitic|duplex"],
+            "category": "scope"
+          },
+          {
+            "id": "A790-24-E02",
+            "query": "What is the minimum yield strength of S32205 per A790?",
+            "expectedPatterns": ["65\\s*ksi|450\\s*MPa"],
+            "forbiddenPatterns": ["70\\s*ksi|485\\s*MPa"],
+            "category": "mechanical"
+          },
+          {
+            "id": "A790-24-E03",
+            "query": "What is the minimum tensile strength of S32205 per A790?",
+            "expectedPatterns": ["90\\s*ksi|620\\s*MPa|95\\s*ksi|655\\s*MPa"],
+            "category": "mechanical"
+          },
+          {
+            "id": "A790-24-E04",
+            "query": "What is the maximum carbon content for S32205 per A790?",
+            "expectedPatterns": ["0\\.030|0\\.03"],
+            "category": "chemical"
+          },
+          {
+            "id": "A790-24-E05",
+            "query": "What is the chromium range for S32205 per A790?",
+            "expectedPatterns": ["22\\.0.*23\\.0|21\\.0.*23\\.0"],
+            "category": "chemical"
+          },
+          {
+            "id": "A790-24-E06",
+            "query": "What is the maximum hardness for S32205 per A790?",
+            "expectedPatterns": ["290\\s*HBW|293\\s*HBW|31\\s*HRC"],
+            "category": "mechanical"
+          },
+          {
+            "id": "A790-24-E07",
+            "query": "What is the minimum elongation for S32205 per A790?",
+            "expectedPatterns": ["25\\s*%|25\\s*percent"],
+            "category": "mechanical"
+          },
+          {
+            "id": "A790-24-E08",
+            "query": "What nickel range is specified for S32205 per A790?",
+            "expectedPatterns": ["4\\.5.*6\\.5|5\\.0.*6\\.0"],
+            "category": "chemical"
+          },
+          {
+            "id": "A790-24-E09",
+            "query": "What molybdenum range is specified for S32205 per A790?",
+            "expectedPatterns": ["3\\.0.*3\\.5|2\\.5.*3\\.5"],
+            "category": "chemical"
+          },
+          {
+            "id": "A790-24-E10",
+            "query": "What nitrogen range is specified for S32205 per A790?",
+            "expectedPatterns": ["0\\.14.*0\\.20|0\\.08.*0\\.20"],
+            "category": "chemical"
+          }
+        ],
+        "medium": [
+          {
+            "id": "A790-24-M01",
+            "query": "What heat treatment is required for S32205 per A790?",
+            "expectedPatterns": ["solution.*anneal|1870|1020|quench|cool|rapid"],
+            "category": "heat_treatment"
+          },
+          {
+            "id": "A790-24-M02",
+            "query": "What quenching methods are permitted after solution annealing per A790?",
+            "expectedPatterns": ["water|liquid|air|spray|mist"],
+            "category": "heat_treatment"
+          },
+          {
+            "id": "A790-24-M03",
+            "query": "What ASTM standards are referenced by A790?",
+            "expectedPatterns": ["A370|A923|A999|A1016|ANSI|AWS|B36"],
+            "category": "references"
+          },
+          {
+            "id": "A790-24-M04",
+            "query": "What NDE methods are specified for A790 pipe?",
+            "expectedPatterns": ["ultrasonic|eddy.*current|hydrostatic|UT|ET"],
+            "category": "testing"
+          },
+          {
+            "id": "A790-24-M05",
+            "query": "What supplementary requirements are available in A790?",
+            "expectedPatterns": ["S1|S2|S3|S4|supplementary"],
+            "category": "supplementary"
+          },
+          {
+            "id": "A790-24-M06",
+            "query": "What marking requirements apply to A790 pipe?",
+            "expectedPatterns": ["heat|lot|size|grade|manufacturer|ASTM"],
+            "category": "marking"
+          },
+          {
+            "id": "A790-24-M07",
+            "query": "What tensile test specimen requirements apply to A790?",
+            "expectedPatterns": ["longitudinal|transverse|full.*section|strip"],
+            "category": "testing"
+          },
+          {
+            "id": "A790-24-M08",
+            "query": "What is the maximum sulfur content for S32750 per A790?",
+            "expectedPatterns": ["0\\.020|0\\.02|0\\.030|0\\.03"],
+            "category": "chemical"
+          },
+          {
+            "id": "A790-24-M09",
+            "query": "What is the minimum yield strength of S32750 super duplex per A790?",
+            "expectedPatterns": ["80\\s*ksi|550\\s*MPa"],
+            "category": "mechanical"
+          },
+          {
+            "id": "A790-24-M10",
+            "query": "What flattening test requirements apply to A790?",
+            "expectedPatterns": ["flatten|section|crack|failure|D/t"],
+            "category": "testing"
+          }
+        ],
+        "difficult": [
+          {
+            "id": "A790-24-D01",
+            "query": "Compare the tensile strength of S32205 vs S32750 per A790",
+            "expectedPatterns": ["S32205.*90|620", "S32750.*116|800"],
+            "category": "comparison"
+          },
+          {
+            "id": "A790-24-D02",
+            "query": "What is the difference in nitrogen content between S32205 and S32750 per A790?",
+            "expectedPatterns": ["S32205.*0\\.14.*0\\.20", "S32750.*0\\.24.*0\\.32"],
+            "category": "comparison"
+          },
+          {
+            "id": "A790-24-D03",
+            "query": "Compare molybdenum content for S32205, S32750, and S32760 per A790",
+            "expectedPatterns": ["Mo|molybdenum|moly", "S32205|2\\.5|3\\.0|3\\.5|cannot"],
+            "category": "comparison"
+          },
+          {
+            "id": "A790-24-D04",
+            "query": "What are the complete mechanical and chemical requirements for S32205 per A790?",
+            "expectedPatterns": ["ksi|MPa|tensile|yield", "Cr|chromium|chemical|composition"],
+            "category": "synthesis"
+          },
+          {
+            "id": "A790-24-D05",
+            "query": "What test specimens and procedures are required for A790 pipe?",
+            "expectedPatterns": ["tension|tensile|flattening|hardness|hydrostatic"],
+            "category": "synthesis"
+          },
+          {
+            "id": "A790-24-D06",
+            "query": "What wall thickness tolerances apply to NPS 4 Schedule 40 A790 pipe?",
+            "expectedPatterns": ["tolerance|%|minimum|wall|12\\.5"],
+            "category": "dimensional"
+          },
+          {
+            "id": "A790-24-D07",
+            "query": "What are all the UNS designations covered by A790 for duplex grades?",
+            "expectedPatterns": ["S31803|S32101|S32205|S32304|S32750|S32760"],
+            "category": "list"
+          },
+          {
+            "id": "A790-24-D08",
+            "query": "What welding procedures are required for A790 pipe repair?",
+            "expectedPatterns": ["Section\\s*15|repair|weld|manufacturer|purchaser"],
+            "category": "welding"
+          },
+          {
+            "id": "A790-24-D09",
+            "query": "What are the certification requirements per A790?",
+            "expectedPatterns": ["certif|report|test.*results|heat|lot"],
+            "category": "certification"
+          },
+          {
+            "id": "A790-24-D10",
+            "query": "What is the complete heat treatment cycle for S31803 per A790 including temperature and cooling?",
+            "expectedPatterns": ["1870.*2010|1020.*1100", "quench|cool", "water|liquid|air"],
+            "category": "heat_treatment"
+          }
+        ],
+        "edge_case": [
+          {
+            "id": "A790-24-EDGE",
+            "query": "What is the PREN formula for calculating pitting resistance of S32205 per A790?",
+            "expectedPatterns": ["cannot|not.*(?:in|included|provided)|no.*(?:information|formula)|don't.*have|not.*specified"],
+            "forbiddenPatterns": ["PREN\\s*=|Cr\\s*\\+\\s*3\\.3|%Cr\\s*\\+"],
+            "category": "refusal",
+            "notes": "PREN formula is NOT in A790 - should refuse"
+          }
+        ]
+      }
+    },
+    "ASTM-A789-2014": {
+      "filename": "ASTM A789 Seamless & Welded Duplex Tubing For General Service 2014.pdf",
+      "description": "Seamless and Welded Ferritic/Austenitic Stainless Steel Tubing (2014)",
+      "queries": {
+        "easy": [
+          {
+            "id": "A789-14-E01",
+            "query": "What is the scope of ASTM A789?",
+            "expectedPatterns": ["tubing|tube", "seamless|welded", "ferritic.*austenitic|duplex"],
+            "forbiddenPatterns": ["\\bpipe\\b"],
+            "category": "scope"
+          },
+          {
+            "id": "A789-14-E02",
+            "query": "What is the minimum yield strength of S32205 per A789?",
+            "expectedPatterns": ["70\\s*ksi|485\\s*MPa"],
+            "forbiddenPatterns": ["65\\s*ksi|450\\s*MPa"],
+            "category": "mechanical"
+          },
+          {
+            "id": "A789-14-E03",
+            "query": "What is the minimum tensile strength of S32205 per A789?",
+            "expectedPatterns": ["95\\s*ksi|655\\s*MPa|90\\s*ksi|620\\s*MPa"],
+            "category": "mechanical"
+          },
+          {
+            "id": "A789-14-E04",
+            "query": "What is the maximum carbon content for S32205 per A789?",
+            "expectedPatterns": ["0\\.030|0\\.03"],
+            "category": "chemical"
+          },
+          {
+            "id": "A789-14-E05",
+            "query": "What product form does A789 cover?",
+            "expectedPatterns": ["tubing|tube"],
+            "forbiddenPatterns": ["\\bpipe\\b"],
+            "category": "scope"
+          },
+          {
+            "id": "A789-14-E06",
+            "query": "What is the chromium range for S32205 per A789?",
+            "expectedPatterns": ["22\\.0.*23\\.0|21\\.0.*23\\.0"],
+            "category": "chemical"
+          },
+          {
+            "id": "A789-14-E07",
+            "query": "What is the maximum hardness for S32205 per A789?",
+            "expectedPatterns": ["290\\s*HBW|293\\s*HBW|31\\s*HRC"],
+            "category": "mechanical"
+          },
+          {
+            "id": "A789-14-E08",
+            "query": "What nickel range is specified for S32205 per A789?",
+            "expectedPatterns": ["4\\.5.*6\\.5|5\\.0.*6\\.0"],
+            "category": "chemical"
+          },
+          {
+            "id": "A789-14-E09",
+            "query": "What molybdenum range is specified for S32205 per A789?",
+            "expectedPatterns": ["3\\.0.*3\\.5|2\\.5.*3\\.5"],
+            "category": "chemical"
+          },
+          {
+            "id": "A789-14-E10",
+            "query": "What nitrogen range is specified for S32205 per A789?",
+            "expectedPatterns": ["0\\.14.*0\\.20|0\\.08.*0\\.20"],
+            "category": "chemical"
+          }
+        ],
+        "medium": [
+          {
+            "id": "A789-14-M01",
+            "query": "What heat treatment is required for S32205 per A789?",
+            "expectedPatterns": ["solution.*anneal|1870|1020|quench|cool|rapid"],
+            "category": "heat_treatment"
+          },
+          {
+            "id": "A789-14-M02",
+            "query": "What supplementary requirements are available in A789?",
+            "expectedPatterns": ["S1|pneumatic"],
+            "forbiddenPatterns": ["S2|S3|S4"],
+            "category": "supplementary"
+          },
+          {
+            "id": "A789-14-M03",
+            "query": "What ASTM standards are referenced by A789?",
+            "expectedPatterns": ["A480|A1016|E527"],
+            "category": "references"
+          },
+          {
+            "id": "A789-14-M04",
+            "query": "What testing methods are specified for A789 tubing?",
+            "expectedPatterns": ["tension|tensile|flattening|hardness|hydrostatic|flare|flange"],
+            "category": "testing"
+          },
+          {
+            "id": "A789-14-M05",
+            "query": "What marking requirements apply to A789 tubing?",
+            "expectedPatterns": ["heat|lot|size|grade|manufacturer|ASTM"],
+            "category": "marking"
+          },
+          {
+            "id": "A789-14-M06",
+            "query": "What dimensional tolerances apply to A789 tubing?",
+            "expectedPatterns": ["OD|outside.*diameter|wall.*thickness|tolerance"],
+            "forbiddenPatterns": ["NPS|nominal.*pipe.*size|schedule\\s*40|schedule\\s*80"],
+            "category": "dimensional"
+          },
+          {
+            "id": "A789-14-M07",
+            "query": "What is the maximum sulfur content for S32750 per A789?",
+            "expectedPatterns": ["0\\.020|0\\.02"],
+            "category": "chemical"
+          },
+          {
+            "id": "A789-14-M08",
+            "query": "What is the minimum yield strength of S32750 super duplex per A789?",
+            "expectedPatterns": ["80\\s*ksi|550\\s*MPa|75\\s*ksi"],
+            "category": "mechanical"
+          },
+          {
+            "id": "A789-14-M09",
+            "query": "What is the tensile strength of S32003 per A789?",
+            "expectedPatterns": ["100\\s*ksi|690\\s*MPa"],
+            "forbiddenPatterns": ["95\\s*ksi|655\\s*MPa"],
+            "category": "mechanical"
+          },
+          {
+            "id": "A789-14-M10",
+            "query": "What hydrostatic test requirements apply to A789?",
+            "expectedPatterns": ["hydrostat|pressure|psi|MPa|test"],
+            "category": "testing"
+          }
+        ],
+        "difficult": [
+          {
+            "id": "A789-14-D01",
+            "query": "Compare the yield strength of S32205 in A789 tubing vs A790 pipe specifications",
+            "expectedPatterns": ["A789.*70\\s*ksi|485\\s*MPa", "A790.*65\\s*ksi|450\\s*MPa"],
+            "category": "comparison"
+          },
+          {
+            "id": "A789-14-D02",
+            "query": "What is the yield strength of S32304 lean duplex per A789 for OD less than or equal to 1 inch?",
+            "expectedPatterns": ["65\\s*ksi|450\\s*MPa"],
+            "forbiddenPatterns": ["58\\s*ksi|400\\s*MPa"],
+            "category": "conditional"
+          },
+          {
+            "id": "A789-14-D03",
+            "query": "What are the complete chemical composition requirements for S32750 per A789?",
+            "expectedPatterns": ["Cr|chromium", "Ni|nickel", "Mo|molybdenum", "N|nitrogen"],
+            "category": "synthesis"
+          },
+          {
+            "id": "A789-14-D04",
+            "query": "What test specimens and procedures are required for A789 tubing?",
+            "expectedPatterns": ["tension|tensile|flattening|hardness|hydrostatic|flare"],
+            "category": "synthesis"
+          },
+          {
+            "id": "A789-14-D05",
+            "query": "What are all the UNS designations covered by A789?",
+            "expectedPatterns": ["S31803|S32101|S32205|S32304|S32750|S32760"],
+            "category": "list"
+          },
+          {
+            "id": "A789-14-D06",
+            "query": "Compare the supplementary requirements between A789 and A790",
+            "expectedPatterns": ["A789.*S1|pneumatic", "A790.*S1.*S2.*S3.*S4"],
+            "category": "comparison"
+          },
+          {
+            "id": "A789-14-D07",
+            "query": "What are the certification requirements per A789?",
+            "expectedPatterns": ["certif|report|test.*results|heat|lot"],
+            "category": "certification"
+          },
+          {
+            "id": "A789-14-D08",
+            "query": "What flattening test requirements apply to A789 tubing?",
+            "expectedPatterns": ["flatten|reverse|crack|failure"],
+            "category": "testing"
+          },
+          {
+            "id": "A789-14-D09",
+            "query": "What is the complete heat treatment cycle for S31803 per A789?",
+            "expectedPatterns": ["1870.*2010|1020.*1100", "quench|cool", "water|liquid|air"],
+            "category": "heat_treatment"
+          },
+          {
+            "id": "A789-14-D10",
+            "query": "What are the differences between A789 and A790 in terms of product form and mechanical properties?",
+            "expectedPatterns": ["tubing|tube", "pipe", "yield", "70.*ksi|65.*ksi"],
+            "category": "comparison"
+          }
+        ],
+        "edge_case": [
+          {
+            "id": "A789-14-EDGE",
+            "query": "Does ASTM A789 include repair welding procedures like Section 15?",
+            "expectedPatterns": ["no|not.*included|not.*cover|cannot|does.*not"],
+            "forbiddenPatterns": ["repair.*permitted|repair.*allowed|Section.*15.*describes|Section.*15.*covers"],
+            "category": "refusal",
+            "notes": "A789 has NO Section 15 - A790 does"
+          }
+        ]
+      }
+    },
+    "ASTM-A872-2014": {
+      "filename": "ASTM A872 Centrifugally Cast Duplex Stainless Steel Pipe 2014.pdf",
+      "description": "Centrifugally Cast Ferritic/Austenitic Stainless Steel Pipe (2014)",
+      "queries": {
+        "easy": [
+          {
+            "id": "A872-E01",
+            "query": "What is the scope of ASTM A872?",
+            "expectedPatterns": ["centrifugal|cast", "pipe", "ferritic.*austenitic|duplex"],
+            "category": "scope"
+          },
+          {
+            "id": "A872-E02",
+            "query": "What manufacturing process does A872 cover?",
+            "expectedPatterns": ["centrifugal|cast"],
+            "category": "scope"
+          },
+          {
+            "id": "A872-E03",
+            "query": "What is the minimum yield strength of J93345 per A872?",
+            "expectedPatterns": ["60\\s*ksi|415\\s*MPa|65\\s*ksi|450\\s*MPa"],
+            "category": "mechanical"
+          },
+          {
+            "id": "A872-E04",
+            "query": "What is the maximum carbon content for duplex grades per A872?",
+            "expectedPatterns": ["0\\.030|0\\.03|0\\.04"],
+            "category": "chemical"
+          },
+          {
+            "id": "A872-E05",
+            "query": "What chromium range is specified for duplex grades per A872?",
+            "expectedPatterns": ["21.*26|22.*25|24.*27"],
+            "category": "chemical"
+          },
+          {
+            "id": "A872-E06",
+            "query": "What is the minimum elongation requirement per A872?",
+            "expectedPatterns": ["20\\s*%|25\\s*%|16\\s*%"],
+            "category": "mechanical"
+          },
+          {
+            "id": "A872-E07",
+            "query": "What nickel range is specified for duplex grades per A872?",
+            "expectedPatterns": ["4.*7|5.*8|3.*6"],
+            "category": "chemical"
+          },
+          {
+            "id": "A872-E08",
+            "query": "What molybdenum range is specified per A872?",
+            "expectedPatterns": ["1\\.5.*3\\.0|2\\.5.*4\\.0|1\\.0.*3\\.5"],
+            "category": "chemical"
+          },
+          {
+            "id": "A872-E09",
+            "query": "What is the maximum hardness requirement per A872?",
+            "expectedPatterns": ["290\\s*HBW|300\\s*HBW|280\\s*HBW"],
+            "category": "mechanical"
+          },
+          {
+            "id": "A872-E10",
+            "query": "What heat treatment is required per A872?",
+            "expectedPatterns": ["solution.*anneal|heat.*treat|quench"],
+            "category": "heat_treatment"
+          }
+        ],
+        "medium": [
+          {
+            "id": "A872-M01",
+            "query": "What testing methods are required for A872 pipe?",
+            "expectedPatterns": ["tension|tensile|hardness|radiograph|hydrostat"],
+            "category": "testing"
+          },
+          {
+            "id": "A872-M02",
+            "query": "What NDE methods are specified for A872?",
+            "expectedPatterns": ["radiograph|ultrasonic|liquid.*penetrant|magnetic|visual"],
+            "category": "testing"
+          },
+          {
+            "id": "A872-M03",
+            "query": "What marking requirements apply to A872 pipe?",
+            "expectedPatterns": ["heat|lot|size|grade|manufacturer|ASTM"],
+            "category": "marking"
+          },
+          {
+            "id": "A872-M04",
+            "query": "What supplementary requirements are available in A872?",
+            "expectedPatterns": ["supplementary|S1|S2|additional"],
+            "category": "supplementary"
+          },
+          {
+            "id": "A872-M05",
+            "query": "What ASTM standards are referenced by A872?",
+            "expectedPatterns": ["A370|A751|E165|E94|E446"],
+            "category": "references"
+          },
+          {
+            "id": "A872-M06",
+            "query": "What repair welding requirements apply to A872?",
+            "expectedPatterns": ["weld|repair|procedure|qualification"],
+            "category": "welding"
+          },
+          {
+            "id": "A872-M07",
+            "query": "What dimensional tolerances apply to A872 pipe?",
+            "expectedPatterns": ["tolerance|wall|diameter|OD|ID"],
+            "category": "dimensional"
+          },
+          {
+            "id": "A872-M08",
+            "query": "What is the minimum tensile strength per A872?",
+            "expectedPatterns": ["90\\s*ksi|620\\s*MPa|85\\s*ksi|100\\s*ksi"],
+            "category": "mechanical"
+          },
+          {
+            "id": "A872-M09",
+            "query": "What is the nitrogen content requirement per A872?",
+            "expectedPatterns": ["0\\.10.*0\\.25|0\\.14.*0\\.20|nitrogen"],
+            "category": "chemical"
+          },
+          {
+            "id": "A872-M10",
+            "query": "What hydrostatic test requirements apply to A872?",
+            "expectedPatterns": ["hydrostat|pressure|psi|MPa|test"],
+            "category": "testing"
+          }
+        ],
+        "difficult": [
+          {
+            "id": "A872-D01",
+            "query": "Compare the manufacturing process of A872 vs A790 pipe",
+            "expectedPatterns": ["A872.*centrifug|cast", "A790.*seamless|welded"],
+            "category": "comparison"
+          },
+          {
+            "id": "A872-D02",
+            "query": "What are the complete chemical composition requirements for duplex grades per A872?",
+            "expectedPatterns": ["Cr|chromium", "Ni|nickel", "Mo|molybdenum", "C|carbon"],
+            "category": "synthesis"
+          },
+          {
+            "id": "A872-D03",
+            "query": "What are all the UNS or grade designations covered by A872?",
+            "expectedPatterns": ["J93345|J93370|J93380|grade"],
+            "category": "list"
+          },
+          {
+            "id": "A872-D04",
+            "query": "What are the acceptance criteria for radiographic examination per A872?",
+            "expectedPatterns": ["radiograph|acceptance|defect|indication|E446"],
+            "category": "testing"
+          },
+          {
+            "id": "A872-D05",
+            "query": "What are the certification requirements per A872?",
+            "expectedPatterns": ["certif|report|test.*results|heat|lot"],
+            "category": "certification"
+          },
+          {
+            "id": "A872-D06",
+            "query": "What is the complete heat treatment cycle including temperature range and cooling per A872?",
+            "expectedPatterns": ["1900.*2100|1040.*1150", "quench|cool", "water|liquid|air"],
+            "category": "heat_treatment"
+          },
+          {
+            "id": "A872-D07",
+            "query": "What specimen requirements apply for tensile testing per A872?",
+            "expectedPatterns": ["specimen|longitudinal|transverse|location|gauge"],
+            "category": "testing"
+          },
+          {
+            "id": "A872-D08",
+            "query": "What visual inspection requirements apply to A872 pipe?",
+            "expectedPatterns": ["visual|surface|defect|finish|inspection"],
+            "category": "testing"
+          },
+          {
+            "id": "A872-D09",
+            "query": "What are the differences between centrifugally cast duplex and wrought duplex pipe?",
+            "expectedPatterns": ["cast|centrifug", "wrought|seamless|welded", "grain|structure"],
+            "category": "comparison"
+          },
+          {
+            "id": "A872-D10",
+            "query": "What ferrite content requirements apply to A872?",
+            "expectedPatterns": ["ferrite|austenite|phase|%|balance"],
+            "category": "microstructure"
+          }
+        ],
+        "edge_case": [
+          {
+            "id": "A872-EDGE",
+            "query": "What is the corrosion rate of A872 duplex pipe in seawater?",
+            "expectedPatterns": ["cannot|not.*(?:in|included|provided)|no.*(?:information|data)|don't.*have|not.*specified"],
+            "forbiddenPatterns": ["mm/year|mpy|corrosion.*rate.*="],
+            "category": "refusal",
+            "notes": "Corrosion rate data not in A872 specification"
+          }
+        ]
+      }
+    },
+    "ASTM-A312-2025": {
+      "filename": "877794297-A312-A312M-25.pdf",
+      "description": "Seamless, Welded, and Heavily Cold Worked Austenitic Stainless Steel Pipes (2025)",
+      "queries": {
+        "easy": [
+          {
+            "id": "A312-E01",
+            "query": "What is the scope of ASTM A312?",
+            "expectedPatterns": ["pipe", "austenitic|stainless", "seamless|welded"],
+            "category": "scope"
+          },
+          {
+            "id": "A312-E02",
+            "query": "What grades are covered by A312?",
+            "expectedPatterns": ["304|316|321|347|TP"],
+            "category": "scope"
+          },
+          {
+            "id": "A312-E03",
+            "query": "What is the minimum yield strength of TP304 per A312?",
+            "expectedPatterns": ["30\\s*ksi|205\\s*MPa"],
+            "category": "mechanical"
+          },
+          {
+            "id": "A312-E04",
+            "query": "What is the minimum tensile strength of TP316 per A312?",
+            "expectedPatterns": ["75\\s*ksi|515\\s*MPa|70\\s*ksi|485\\s*MPa"],
+            "category": "mechanical"
+          },
+          {
+            "id": "A312-E05",
+            "query": "What is the maximum carbon content for TP304L per A312?",
+            "expectedPatterns": ["0\\.030|0\\.03"],
+            "category": "chemical"
+          },
+          {
+            "id": "A312-E06",
+            "query": "What chromium range is specified for TP316 per A312?",
+            "expectedPatterns": ["16\\.0.*18\\.0"],
+            "category": "chemical"
+          },
+          {
+            "id": "A312-E07",
+            "query": "What nickel range is specified for TP304 per A312?",
+            "expectedPatterns": ["8\\.0.*11\\.0|8\\.0.*10\\.5"],
+            "category": "chemical"
+          },
+          {
+            "id": "A312-E08",
+            "query": "What is the minimum elongation for TP304 per A312?",
+            "expectedPatterns": ["35\\s*%|30\\s*%"],
+            "category": "mechanical"
+          },
+          {
+            "id": "A312-E09",
+            "query": "What molybdenum range is specified for TP316 per A312?",
+            "expectedPatterns": ["2\\.0.*3\\.0"],
+            "category": "chemical"
+          },
+          {
+            "id": "A312-E10",
+            "query": "What heat treatment is required for A312 pipe?",
+            "expectedPatterns": ["solution.*anneal|anneal|heat.*treat"],
+            "category": "heat_treatment"
+          }
+        ],
+        "medium": [
+          {
+            "id": "A312-M01",
+            "query": "What is the difference between TP304 and TP304L per A312?",
+            "expectedPatterns": ["carbon|0\\.08|0\\.030|L.*low"],
+            "category": "comparison"
+          },
+          {
+            "id": "A312-M02",
+            "query": "What testing methods are required for A312 pipe?",
+            "expectedPatterns": ["tension|tensile|flattening|hardness|hydrostatic|bend|test|cannot"],
+            "category": "testing"
+          },
+          {
+            "id": "A312-M03",
+            "query": "What NDE methods are specified for A312 welded pipe?",
+            "expectedPatterns": ["ultrasonic|eddy.*current|radiograph|hydrostatic"],
+            "category": "testing"
+          },
+          {
+            "id": "A312-M04",
+            "query": "What supplementary requirements are available in A312?",
+            "expectedPatterns": ["S1|S2|S3|supplementary"],
+            "category": "supplementary"
+          },
+          {
+            "id": "A312-M05",
+            "query": "What marking requirements apply to A312 pipe?",
+            "expectedPatterns": ["heat|lot|size|grade|manufacturer|ASTM"],
+            "category": "marking"
+          },
+          {
+            "id": "A312-M06",
+            "query": "What ASTM standards are referenced by A312?",
+            "expectedPatterns": ["A370|A999|A1016|E112|E213"],
+            "category": "references"
+          },
+          {
+            "id": "A312-M07",
+            "query": "What is the minimum yield strength of TP316L per A312?",
+            "expectedPatterns": ["25\\s*ksi|170\\s*MPa|30\\s*ksi|205\\s*MPa"],
+            "category": "mechanical"
+          },
+          {
+            "id": "A312-M08",
+            "query": "What grain size requirements apply to A312?",
+            "expectedPatterns": ["grain.*size|ASTM.*No|E112"],
+            "category": "microstructure"
+          },
+          {
+            "id": "A312-M09",
+            "query": "What flattening test requirements apply to A312?",
+            "expectedPatterns": ["flatten|crack|failure|D/t"],
+            "category": "testing"
+          },
+          {
+            "id": "A312-M10",
+            "query": "What hydrostatic test requirements apply to A312?",
+            "expectedPatterns": ["hydrostat|pressure|psi|MPa|test"],
+            "category": "testing"
+          }
+        ],
+        "difficult": [
+          {
+            "id": "A312-D01",
+            "query": "Compare the mechanical properties of TP304 vs TP316 per A312",
+            "expectedPatterns": ["304.*yield", "316.*yield", "tensile|strength"],
+            "category": "comparison"
+          },
+          {
+            "id": "A312-D02",
+            "query": "What are all the TP grades covered by A312?",
+            "expectedPatterns": ["304|316|321|347|304L|316L|304H|316H"],
+            "category": "list"
+          },
+          {
+            "id": "A312-D03",
+            "query": "What are the complete chemical composition requirements for TP316L per A312?",
+            "expectedPatterns": ["Cr|chromium", "Ni|nickel", "Mo|molybdenum", "C.*0\\.030"],
+            "category": "synthesis"
+          },
+          {
+            "id": "A312-D04",
+            "query": "What are the certification requirements per A312?",
+            "expectedPatterns": ["certif|report|test.*results|heat|lot"],
+            "category": "certification"
+          },
+          {
+            "id": "A312-D05",
+            "query": "What is the complete heat treatment cycle for TP304 per A312?",
+            "expectedPatterns": ["1900|1040|anneal|quench|cool|cannot|not.*specified"],
+            "category": "heat_treatment"
+          },
+          {
+            "id": "A312-D06",
+            "query": "What dimensional tolerances apply to A312 pipe?",
+            "expectedPatterns": ["tolerance|wall|diameter|OD|schedule"],
+            "category": "dimensional"
+          },
+          {
+            "id": "A312-D07",
+            "query": "What is the difference between seamless and welded pipe per A312?",
+            "expectedPatterns": ["seamless|welded|weld.*seam|manufacturing"],
+            "category": "comparison"
+          },
+          {
+            "id": "A312-D08",
+            "query": "What specimen requirements apply for tensile testing per A312?",
+            "expectedPatterns": ["specimen|longitudinal|transverse|full.*section|strip"],
+            "category": "testing"
+          },
+          {
+            "id": "A312-D09",
+            "query": "What repair welding requirements apply to A312?",
+            "expectedPatterns": ["weld|repair|procedure|filler"],
+            "category": "welding"
+          },
+          {
+            "id": "A312-D10",
+            "query": "What intergranular corrosion testing requirements apply to A312?",
+            "expectedPatterns": ["intergranular|corrosion|A262|sensitization"],
+            "category": "testing"
+          }
+        ],
+        "edge_case": [
+          {
+            "id": "A312-EDGE",
+            "query": "What is the price per foot of A312 TP316 pipe?",
+            "expectedPatterns": ["cannot|not.*(?:in|included|provided)|no.*(?:information|pricing)|don't.*have|not.*specified"],
+            "forbiddenPatterns": ["\\$\\d|USD\\s*\\d|cost.*is.*\\$|price.*is.*\\$|\\d+.*dollars"],
+            "category": "refusal",
+            "notes": "Pricing never in specifications"
+          }
+        ]
+      }
+    },
+    "API-5CT": {
+      "filename": "API Spec 5CT Purchasing Guidelines 9th Edition 2012-04.pdf",
+      "description": "API Specification for Casing and Tubing (Purchasing Guidelines)",
+      "queries": {
+        "easy": [
+          {
+            "id": "5CT-E01",
+            "query": "What is the scope of API 5CT?",
+            "expectedPatterns": ["casing|tubing", "oil|gas|well"],
+            "category": "scope"
+          },
+          {
+            "id": "5CT-E02",
+            "query": "What grades are covered by API 5CT?",
+            "expectedPatterns": ["J55|K55|N80|L80|P110|C90|T95"],
+            "category": "scope"
+          },
+          {
+            "id": "5CT-E03",
+            "query": "What is the minimum yield strength of J55 grade per API 5CT?",
+            "expectedPatterns": ["55\\s*ksi|379\\s*MPa"],
+            "category": "mechanical"
+          },
+          {
+            "id": "5CT-E04",
+            "query": "What is the minimum yield strength of P110 grade per API 5CT?",
+            "expectedPatterns": ["110\\s*ksi|758\\s*MPa"],
+            "category": "mechanical"
+          },
+          {
+            "id": "5CT-E05",
+            "query": "What is the maximum yield strength of L80 grade per API 5CT?",
+            "expectedPatterns": ["95\\s*ksi|655\\s*MPa"],
+            "category": "mechanical"
+          },
+          {
+            "id": "5CT-E06",
+            "query": "What heat treatment is required for L80 grade per API 5CT?",
+            "expectedPatterns": ["quench.*temper|Q&T|heat.*treat"],
+            "category": "heat_treatment"
+          },
+          {
+            "id": "5CT-E07",
+            "query": "What is the maximum hardness for L80 per API 5CT?",
+            "expectedPatterns": ["23\\s*HRC|241\\s*HBW|22\\s*HRC"],
+            "category": "mechanical"
+          },
+          {
+            "id": "5CT-E08",
+            "query": "What threading options are available for API 5CT casing?",
+            "expectedPatterns": ["buttress|BTC|LTC|STC|round|thread"],
+            "category": "threading"
+          },
+          {
+            "id": "5CT-E09",
+            "query": "What coupling requirements apply to API 5CT?",
+            "expectedPatterns": ["coupling|connection|thread|make.*up"],
+            "category": "connections"
+          },
+          {
+            "id": "5CT-E10",
+            "query": "What minimum elongation is required per API 5CT?",
+            "expectedPatterns": ["elongation|%|formula"],
+            "category": "mechanical"
+          }
+        ],
+        "medium": [
+          {
+            "id": "5CT-M01",
+            "query": "What is the difference between L80 and C90 grades per API 5CT?",
+            "expectedPatterns": ["L80|C90|grade|cannot", "yield|strength|sour|sulfide|not.*provided"],
+            "category": "comparison"
+          },
+          {
+            "id": "5CT-M02",
+            "query": "What testing methods are required for API 5CT?",
+            "expectedPatterns": ["tension|tensile|hardness|impact|hydrostatic|drift|test|cannot"],
+            "category": "testing"
+          },
+          {
+            "id": "5CT-M03",
+            "query": "What impact testing requirements apply to API 5CT?",
+            "expectedPatterns": ["Charpy|CVN|impact|joule|ft.*lb|temperature"],
+            "category": "testing"
+          },
+          {
+            "id": "5CT-M04",
+            "query": "What marking requirements apply to API 5CT?",
+            "expectedPatterns": ["marking|stencil|color|grade|size|API"],
+            "category": "marking"
+          },
+          {
+            "id": "5CT-M05",
+            "query": "What dimensional tolerances apply to API 5CT casing?",
+            "expectedPatterns": ["tolerance|wall|diameter|OD|drift"],
+            "category": "dimensional"
+          },
+          {
+            "id": "5CT-M06",
+            "query": "What is the drift diameter requirement per API 5CT?",
+            "expectedPatterns": ["drift|diameter|mandrel|minimum"],
+            "category": "dimensional"
+          },
+          {
+            "id": "5CT-M07",
+            "query": "What hydrostatic test requirements apply to API 5CT?",
+            "expectedPatterns": ["hydrostatic|pressure|psi|MPa|test|hold"],
+            "category": "testing"
+          },
+          {
+            "id": "5CT-M08",
+            "query": "What is the chemical composition for J55 per API 5CT?",
+            "expectedPatterns": ["carbon|manganese|sulfur|phosphorus|C|Mn|S|P"],
+            "category": "chemical"
+          },
+          {
+            "id": "5CT-M09",
+            "query": "What NDE requirements apply to API 5CT?",
+            "expectedPatterns": ["NDE|ultrasonic|EMI|magnetic|flux|inspection"],
+            "category": "testing"
+          },
+          {
+            "id": "5CT-M10",
+            "query": "What PSL levels are defined in API 5CT?",
+            "expectedPatterns": ["PSL.*1|PSL.*2|PSL.*3|product.*specification.*level"],
+            "category": "quality"
+          }
+        ],
+        "difficult": [
+          {
+            "id": "5CT-D01",
+            "query": "Compare the yield strength ranges of all sour service grades per API 5CT",
+            "expectedPatterns": ["L80|C90|T95|sour|sulfide|yield"],
+            "category": "comparison"
+          },
+          {
+            "id": "5CT-D02",
+            "query": "What are all the API 5CT grades and their yield strength ranges?",
+            "expectedPatterns": ["J55|K55|N80|L80|C90|T95|P110|yield|ksi"],
+            "category": "list"
+          },
+          {
+            "id": "5CT-D03",
+            "query": "What are the complete requirements for SSC resistance per API 5CT?",
+            "expectedPatterns": ["SSC|sulfide.*stress|NACE|hardness|sour"],
+            "category": "synthesis"
+          },
+          {
+            "id": "5CT-D04",
+            "query": "What are the certification requirements per API 5CT?",
+            "expectedPatterns": ["certif|report|test.*results|heat|lot|MTR"],
+            "category": "certification"
+          },
+          {
+            "id": "5CT-D05",
+            "query": "What are the differences between PSL-1, PSL-2, and PSL-3 per API 5CT?",
+            "expectedPatterns": ["PSL.*1|PSL.*2|PSL.*3|testing|requirements|CVN"],
+            "category": "comparison"
+          },
+          {
+            "id": "5CT-D06",
+            "query": "What are the complete heat treatment requirements for C90 per API 5CT?",
+            "expectedPatterns": ["quench|temper|austeniti|temperature|cool"],
+            "category": "heat_treatment"
+          },
+          {
+            "id": "5CT-D07",
+            "query": "What are all threading specifications per API 5CT?",
+            "expectedPatterns": ["BTC|LTC|STC|buttress|round|thread|pitch|taper"],
+            "category": "threading"
+          },
+          {
+            "id": "5CT-D08",
+            "query": "What are the connection makeup torque requirements per API 5CT?",
+            "expectedPatterns": ["torque|makeup|connection|ft.*lb|N.*m"],
+            "category": "connections"
+          },
+          {
+            "id": "5CT-D09",
+            "query": "What upset configurations are available per API 5CT?",
+            "expectedPatterns": ["upset|EU|NU|plain.*end|external|internal"],
+            "category": "dimensional"
+          },
+          {
+            "id": "5CT-D10",
+            "query": "What are the traceability requirements per API 5CT?",
+            "expectedPatterns": ["traceability|heat|lot|identification|marking"],
+            "category": "quality"
+          }
+        ],
+        "edge_case": [
+          {
+            "id": "5CT-EDGE",
+            "query": "What is the lead time for API 5CT casing delivery?",
+            "expectedPatterns": ["cannot|not.*(?:in|included|provided)|no.*(?:information|lead.*time)|don't.*have|not.*specified"],
+            "forbiddenPatterns": ["\\d+.*weeks|\\d+.*days|\\d+.*months|lead.*time.*is.*\\d"],
+            "category": "refusal",
+            "notes": "Lead time is not in API specifications"
+          }
+        ]
+      }
+    },
+    "API-6A": {
+      "filename": "API Spec 6A Wellhead & Xmas Tree Equipment 20th Edition Errata At 2016.pdf",
+      "description": "Wellhead and Christmas Tree Equipment",
+      "queries": {
+        "easy": [
+          {
+            "id": "6A-E01",
+            "query": "What is the scope of API 6A?",
+            "expectedPatterns": ["wellhead|christmas.*tree|surface", "pressure|equipment"],
+            "category": "scope"
+          },
+          {
+            "id": "6A-E02",
+            "query": "What pressure ratings are covered by API 6A?",
+            "expectedPatterns": ["2000|3000|5000|10000|15000|20000|psi"],
+            "category": "scope"
+          },
+          {
+            "id": "6A-E03",
+            "query": "What material classes are defined in API 6A?",
+            "expectedPatterns": ["AA|BB|CC|DD|EE|FF|HH|class"],
+            "category": "materials"
+          },
+          {
+            "id": "6A-E04",
+            "query": "What is the minimum yield strength for Class AA material per API 6A?",
+            "expectedPatterns": ["36\\s*ksi|248\\s*MPa|45\\s*ksi"],
+            "category": "mechanical"
+          },
+          {
+            "id": "6A-E05",
+            "query": "What temperature ratings are covered by API 6A?",
+            "expectedPatterns": ["K|L|P|R|S|T|U|V|temperature"],
+            "category": "scope"
+          },
+          {
+            "id": "6A-E06",
+            "query": "What ring gasket types are specified in API 6A?",
+            "expectedPatterns": ["R|RX|BX|ring|gasket|groove"],
+            "category": "connections"
+          },
+          {
+            "id": "6A-E07",
+            "query": "What flange types are covered by API 6A?",
+            "expectedPatterns": ["6B|6BX|flange|connection"],
+            "category": "connections"
+          },
+          {
+            "id": "6A-E08",
+            "query": "What is the proof test pressure requirement per API 6A?",
+            "expectedPatterns": ["proof|1\\.5|150%|working.*pressure"],
+            "category": "testing"
+          },
+          {
+            "id": "6A-E09",
+            "query": "What valve types are covered by API 6A?",
+            "expectedPatterns": ["gate|ball|check|valve"],
+            "category": "scope"
+          },
+          {
+            "id": "6A-E10",
+            "query": "What marking requirements apply to API 6A equipment?",
+            "expectedPatterns": ["marking|nameplate|rating|manufacturer|API"],
+            "category": "marking"
+          }
+        ],
+        "medium": [
+          {
+            "id": "6A-M01",
+            "query": "What PSL levels are defined in API 6A?",
+            "expectedPatterns": ["PSL.*1|PSL.*2|PSL.*3|PSL.*4|product.*specification"],
+            "category": "quality"
+          },
+          {
+            "id": "6A-M02",
+            "query": "What testing methods are required for API 6A?",
+            "expectedPatterns": ["hydrostatic|gas|functional|NDE|visual|dimensional"],
+            "category": "testing"
+          },
+          {
+            "id": "6A-M03",
+            "query": "What NDE requirements apply to API 6A?",
+            "expectedPatterns": ["NDE|MT|PT|UT|RT|magnetic|penetrant|ultrasonic"],
+            "category": "testing"
+          },
+          {
+            "id": "6A-M04",
+            "query": "What impact testing requirements apply to API 6A?",
+            "expectedPatterns": ["Charpy|CVN|impact|joule|ft.*lb|temperature"],
+            "category": "testing"
+          },
+          {
+            "id": "6A-M05",
+            "query": "What hardness requirements apply to API 6A?",
+            "expectedPatterns": ["hardness|HRC|HBW|Brinell|Rockwell"],
+            "category": "mechanical"
+          },
+          {
+            "id": "6A-M06",
+            "query": "What weld requirements apply to API 6A?",
+            "expectedPatterns": ["weld|procedure|WPS|PQR|qualification"],
+            "category": "welding"
+          },
+          {
+            "id": "6A-M07",
+            "query": "What design validation requirements apply to API 6A?",
+            "expectedPatterns": ["design.*validation|DVT|prototype|test"],
+            "category": "design"
+          },
+          {
+            "id": "6A-M08",
+            "query": "What are the dimensional requirements for API 6A flanges?",
+            "expectedPatterns": ["dimension|bore|OD|thickness|bolt|stud"],
+            "category": "dimensional"
+          },
+          {
+            "id": "6A-M09",
+            "query": "What material traceability requirements apply to API 6A?",
+            "expectedPatterns": ["traceability|heat|lot|identification|MTR"],
+            "category": "quality"
+          },
+          {
+            "id": "6A-M10",
+            "query": "What corrosion resistant material requirements apply to API 6A?",
+            "expectedPatterns": ["CRA|corrosion.*resist|stainless|alloy|overlay"],
+            "category": "materials"
+          }
+        ],
+        "difficult": [
+          {
+            "id": "6A-D01",
+            "query": "Compare the requirements for PSL-1 through PSL-4 per API 6A",
+            "expectedPatterns": ["PSL.*1|PSL.*2|PSL.*3|PSL.*4|testing|NDE|design"],
+            "category": "comparison"
+          },
+          {
+            "id": "6A-D02",
+            "query": "What are all the material classes and their yield strength requirements per API 6A?",
+            "expectedPatterns": ["AA|BB|CC|DD|EE|FF|yield|ksi|MPa"],
+            "category": "list"
+          },
+          {
+            "id": "6A-D03",
+            "query": "What are the complete requirements for H2S service per API 6A?",
+            "expectedPatterns": ["H2S|sour|hardness|NACE|SSC|HIC"],
+            "category": "synthesis"
+          },
+          {
+            "id": "6A-D04",
+            "query": "What are the certification requirements per API 6A?",
+            "expectedPatterns": ["certif|report|test.*results|MTR|quality.*record"],
+            "category": "certification"
+          },
+          {
+            "id": "6A-D05",
+            "query": "What are all the API 6A ring gasket dimensions for 10000 psi service?",
+            "expectedPatterns": ["R|RX|BX|dimension|groove|10000|psi"],
+            "category": "dimensional"
+          },
+          {
+            "id": "6A-D06",
+            "query": "What are the functional test requirements per API 6A?",
+            "expectedPatterns": ["functional|cycle|operation|test|valve"],
+            "category": "testing"
+          },
+          {
+            "id": "6A-D07",
+            "query": "What are the bore size tolerances for API 6A equipment?",
+            "expectedPatterns": ["bore|tolerance|drift|nominal|minimum|maximum"],
+            "category": "dimensional"
+          },
+          {
+            "id": "6A-D08",
+            "query": "What are the requirements for weld overlay cladding per API 6A?",
+            "expectedPatterns": ["overlay|clad|weld|thickness|bond|NDE"],
+            "category": "welding"
+          },
+          {
+            "id": "6A-D09",
+            "query": "What are the temperature de-rating requirements per API 6A?",
+            "expectedPatterns": ["temperature|derate|rating|elevated|high.*temp"],
+            "category": "design"
+          },
+          {
+            "id": "6A-D10",
+            "query": "What are the fire test requirements per API 6A?",
+            "expectedPatterns": ["fire|test|API.*6FA|flame|rating"],
+            "category": "testing"
+          }
+        ],
+        "edge_case": [
+          {
+            "id": "6A-EDGE",
+            "query": "What is the fatigue life of API 6A wellhead equipment?",
+            "expectedPatterns": ["cannot|not.*(?:in|included|provided)|no.*(?:information|fatigue.*life)|don't.*have|not.*specified|API.*17"],
+            "forbiddenPatterns": ["cycles|years|fatigue.*life.*="],
+            "category": "refusal",
+            "notes": "Fatigue life not specified in API 6A - requires API 17D for subsea"
+          }
+        ]
+      }
+    },
+    "API-16C": {
+      "filename": "API Spec 16C Choke & Kill Systems 1993.pdf",
+      "description": "Choke and Kill Systems (1993 Edition)",
+      "queries": {
+        "easy": [
+          {
+            "id": "16C-E01",
+            "query": "What is the scope of API 16C?",
+            "expectedPatterns": ["choke|kill", "system|equipment", "well.*control"],
+            "category": "scope"
+          },
+          {
+            "id": "16C-E02",
+            "query": "What pressure ratings are covered by API 16C?",
+            "expectedPatterns": ["5000|10000|15000|psi"],
+            "category": "scope"
+          },
+          {
+            "id": "16C-E03",
+            "query": "What choke types are covered by API 16C?",
+            "expectedPatterns": ["adjustable|positive|choke|manual|hydraulic"],
+            "category": "scope"
+          },
+          {
+            "id": "16C-E04",
+            "query": "What manifold types are covered by API 16C?",
+            "expectedPatterns": ["manifold|choke|kill"],
+            "category": "scope"
+          },
+          {
+            "id": "16C-E05",
+            "query": "What proof test pressure is required per API 16C?",
+            "expectedPatterns": ["proof|1\\.5|150%|working.*pressure"],
+            "category": "testing"
+          },
+          {
+            "id": "16C-E06",
+            "query": "What material requirements apply to API 16C?",
+            "expectedPatterns": ["material|steel|alloy|specification"],
+            "category": "materials"
+          },
+          {
+            "id": "16C-E07",
+            "query": "What marking requirements apply to API 16C?",
+            "expectedPatterns": ["marking|nameplate|rating|manufacturer|API"],
+            "category": "marking"
+          },
+          {
+            "id": "16C-E08",
+            "query": "What connection types are used in API 16C?",
+            "expectedPatterns": ["flange|union|connection|hub"],
+            "category": "connections"
+          },
+          {
+            "id": "16C-E09",
+            "query": "What valve types are used in choke and kill systems per API 16C?",
+            "expectedPatterns": ["gate|check|valve|isolation"],
+            "category": "scope"
+          },
+          {
+            "id": "16C-E10",
+            "query": "What bore sizes are covered by API 16C?",
+            "expectedPatterns": ["bore|2|3|4|inch|size"],
+            "category": "dimensional"
+          }
+        ],
+        "medium": [
+          {
+            "id": "16C-M01",
+            "query": "What testing methods are required for API 16C?",
+            "expectedPatterns": ["hydrostatic|function|NDE|test|cannot|16C"],
+            "category": "testing"
+          },
+          {
+            "id": "16C-M02",
+            "query": "What NDE requirements apply to API 16C?",
+            "expectedPatterns": ["NDE|MT|PT|UT|RT|magnetic|penetrant"],
+            "category": "testing"
+          },
+          {
+            "id": "16C-M03",
+            "query": "What design requirements apply to API 16C chokes?",
+            "expectedPatterns": ["design|flow|capacity|erosion|pressure"],
+            "category": "design"
+          },
+          {
+            "id": "16C-M04",
+            "query": "What dimensional tolerances apply to API 16C?",
+            "expectedPatterns": ["tolerance|dimension|bore|flange"],
+            "category": "dimensional"
+          },
+          {
+            "id": "16C-M05",
+            "query": "What weld requirements apply to API 16C?",
+            "expectedPatterns": ["weld|procedure|qualification|repair"],
+            "category": "welding"
+          },
+          {
+            "id": "16C-M06",
+            "query": "What functional test requirements apply to API 16C?",
+            "expectedPatterns": ["function|operation|test|cycle"],
+            "category": "testing"
+          },
+          {
+            "id": "16C-M07",
+            "query": "What erosion considerations apply to API 16C chokes?",
+            "expectedPatterns": ["erosion|wear|trim|replaceable|life"],
+            "category": "design"
+          },
+          {
+            "id": "16C-M08",
+            "query": "What flow control requirements apply to API 16C?",
+            "expectedPatterns": ["flow|control|coefficient|Cv|rate"],
+            "category": "design"
+          },
+          {
+            "id": "16C-M09",
+            "query": "What actuator requirements apply to API 16C?",
+            "expectedPatterns": ["actuator|hydraulic|manual|remote|control"],
+            "category": "controls"
+          },
+          {
+            "id": "16C-M10",
+            "query": "What sour service requirements apply to API 16C?",
+            "expectedPatterns": ["sour|H2S|NACE|hardness|sulfide"],
+            "category": "materials"
+          }
+        ],
+        "difficult": [
+          {
+            "id": "16C-D01",
+            "query": "What are the complete testing requirements for API 16C equipment?",
+            "expectedPatterns": ["hydrostatic|function|NDE|visual|dimensional|test|cannot"],
+            "category": "synthesis"
+          },
+          {
+            "id": "16C-D02",
+            "query": "What are all the API 16C standard configurations?",
+            "expectedPatterns": ["configuration|layout|manifold|choke|kill"],
+            "category": "list"
+          },
+          {
+            "id": "16C-D03",
+            "query": "What are the certification requirements per API 16C?",
+            "expectedPatterns": ["certif|report|test.*results|documentation"],
+            "category": "certification"
+          },
+          {
+            "id": "16C-D04",
+            "query": "Compare adjustable vs positive chokes per API 16C",
+            "expectedPatterns": ["adjustable|positive|choke|bean|orifice"],
+            "category": "comparison"
+          },
+          {
+            "id": "16C-D05",
+            "query": "What are the complete material requirements for 15000 psi service per API 16C?",
+            "expectedPatterns": ["15000|material|yield|hardness|specification"],
+            "category": "synthesis"
+          },
+          {
+            "id": "16C-D06",
+            "query": "What pressure boundary weld requirements apply to API 16C?",
+            "expectedPatterns": ["pressure.*boundary|weld|procedure|NDE|repair"],
+            "category": "welding"
+          },
+          {
+            "id": "16C-D07",
+            "query": "What are the trim selection criteria for API 16C chokes?",
+            "expectedPatterns": ["trim|selection|erosion|material|tungsten|carbide"],
+            "category": "design"
+          },
+          {
+            "id": "16C-D08",
+            "query": "What are the installation requirements for API 16C systems?",
+            "expectedPatterns": ["install|mounting|support|orientation"],
+            "category": "installation"
+          },
+          {
+            "id": "16C-D09",
+            "query": "What are the maintenance requirements for API 16C equipment?",
+            "expectedPatterns": ["maintenance|inspection|service|replace|interval"],
+            "category": "maintenance"
+          },
+          {
+            "id": "16C-D10",
+            "query": "What are the API 16C requirements for remote choke operation?",
+            "expectedPatterns": ["remote|operation|control|hydraulic|indication"],
+            "category": "controls"
+          }
+        ],
+        "edge_case": [
+          {
+            "id": "16C-EDGE",
+            "query": "What is the mean time between failures (MTBF) for API 16C chokes?",
+            "expectedPatterns": ["cannot|not.*(?:in|included|provided)|no.*(?:information|MTBF)|don't.*have|not.*specified"],
+            "forbiddenPatterns": ["hours|years|MTBF.*=|reliability"],
+            "category": "refusal",
+            "notes": "MTBF data not in API 16C specification"
+          }
+        ]
+      }
+    },
+    "ASTM-A1049": {
+      "filename": "ASTM A1049 Duplex Stainless Steel Forgings For Pressure Vessels R 2015.pdf",
+      "description": "Duplex Stainless Steel Forgings for Pressure Vessels",
+      "queries": {
+        "easy": [
+          {
+            "id": "A1049-E01",
+            "query": "What is the scope of ASTM A1049?",
+            "expectedPatterns": ["forging|pressure.*vessel", "ferritic.*austenitic|duplex"],
+            "category": "scope"
+          },
+          {
+            "id": "A1049-E02",
+            "query": "What product form does A1049 cover?",
+            "expectedPatterns": ["forging|bar|ring|shape"],
+            "category": "scope"
+          },
+          {
+            "id": "A1049-E03",
+            "query": "What grades are covered by A1049?",
+            "expectedPatterns": ["S31803|S32205|S32304|S32750|S32760"],
+            "category": "scope"
+          },
+          {
+            "id": "A1049-E04",
+            "query": "What is the minimum yield strength per A1049?",
+            "expectedPatterns": ["65\\s*ksi|450\\s*MPa|60\\s*ksi|415\\s*MPa"],
+            "category": "mechanical"
+          },
+          {
+            "id": "A1049-E05",
+            "query": "What heat treatment is required per A1049?",
+            "expectedPatterns": ["solution.*anneal|heat.*treat|quench"],
+            "category": "heat_treatment"
+          },
+          {
+            "id": "A1049-E06",
+            "query": "What is the maximum carbon content per A1049?",
+            "expectedPatterns": ["0\\.030|0\\.03"],
+            "category": "chemical"
+          },
+          {
+            "id": "A1049-E07",
+            "query": "What is the chromium range for S32205 per A1049?",
+            "expectedPatterns": ["22\\.0.*23\\.0|21\\.0.*23\\.0"],
+            "category": "chemical"
+          },
+          {
+            "id": "A1049-E08",
+            "query": "What is the minimum elongation requirement per A1049?",
+            "expectedPatterns": ["20\\s*%|25\\s*%|18\\s*%"],
+            "category": "mechanical"
+          },
+          {
+            "id": "A1049-E09",
+            "query": "What is the maximum hardness per A1049?",
+            "expectedPatterns": ["290\\s*HBW|293\\s*HBW|31\\s*HRC"],
+            "category": "mechanical"
+          },
+          {
+            "id": "A1049-E10",
+            "query": "What nickel range is specified per A1049?",
+            "expectedPatterns": ["4\\.5.*6\\.5|5\\.0.*6\\.0"],
+            "category": "chemical"
+          }
+        ],
+        "medium": [
+          {
+            "id": "A1049-M01",
+            "query": "What testing methods are required for A1049?",
+            "expectedPatterns": ["tension|tensile|hardness|impact|Charpy"],
+            "category": "testing"
+          },
+          {
+            "id": "A1049-M02",
+            "query": "What impact testing requirements apply to A1049?",
+            "expectedPatterns": ["Charpy|CVN|impact|joule|ft.*lb|temperature"],
+            "category": "testing"
+          },
+          {
+            "id": "A1049-M03",
+            "query": "What supplementary requirements are available in A1049?",
+            "expectedPatterns": ["supplementary|S1|S2|additional"],
+            "category": "supplementary"
+          },
+          {
+            "id": "A1049-M04",
+            "query": "What ASTM standards are referenced by A1049?",
+            "expectedPatterns": ["A370|A751|E112|A923"],
+            "category": "references"
+          },
+          {
+            "id": "A1049-M05",
+            "query": "What marking requirements apply to A1049?",
+            "expectedPatterns": ["marking|heat|lot|grade|manufacturer"],
+            "category": "marking"
+          },
+          {
+            "id": "A1049-M06",
+            "query": "What NDE requirements apply to A1049?",
+            "expectedPatterns": ["NDE|ultrasonic|magnetic|liquid.*penetrant|visual"],
+            "category": "testing"
+          },
+          {
+            "id": "A1049-M07",
+            "query": "What is the nitrogen content requirement per A1049?",
+            "expectedPatterns": ["0\\.10.*0\\.25|0\\.14.*0\\.20|nitrogen"],
+            "category": "chemical"
+          },
+          {
+            "id": "A1049-M08",
+            "query": "What repair welding requirements apply to A1049?",
+            "expectedPatterns": ["weld|repair|procedure|qualification"],
+            "category": "welding"
+          },
+          {
+            "id": "A1049-M09",
+            "query": "What tensile specimen requirements apply to A1049?",
+            "expectedPatterns": ["specimen|longitudinal|transverse|location"],
+            "category": "testing"
+          },
+          {
+            "id": "A1049-M10",
+            "query": "What corrosion testing requirements apply to A1049?",
+            "expectedPatterns": ["corrosion|A923|ferric.*chloride|intergranular"],
+            "category": "testing"
+          }
+        ],
+        "difficult": [
+          {
+            "id": "A1049-D01",
+            "query": "Compare the mechanical properties across all A1049 grades",
+            "expectedPatterns": ["S31803|S32205|S32750", "yield|tensile|elongation"],
+            "category": "comparison"
+          },
+          {
+            "id": "A1049-D02",
+            "query": "What are the complete chemical composition requirements for S32750 per A1049?",
+            "expectedPatterns": ["Cr|chromium|chemical|cannot", "Ni|nickel|Mo|molybdenum|not.*provided"],
+            "category": "synthesis"
+          },
+          {
+            "id": "A1049-D03",
+            "query": "What are the certification requirements per A1049?",
+            "expectedPatterns": ["certif|report|test.*results|heat|lot"],
+            "category": "certification"
+          },
+          {
+            "id": "A1049-D04",
+            "query": "What is the complete heat treatment cycle including temperature and cooling per A1049?",
+            "expectedPatterns": ["1870.*2010|1020.*1100", "quench|cool", "water|liquid|air"],
+            "category": "heat_treatment"
+          },
+          {
+            "id": "A1049-D05",
+            "query": "What are all the UNS designations covered by A1049?",
+            "expectedPatterns": ["S31803|S32101|S32205|S32304|S32750|S32760"],
+            "category": "list"
+          },
+          {
+            "id": "A1049-D06",
+            "query": "What ferrite content requirements apply to A1049?",
+            "expectedPatterns": ["ferrite|austenite|phase|%|balance|40.*60"],
+            "category": "microstructure"
+          },
+          {
+            "id": "A1049-D07",
+            "query": "Compare A1049 forgings with A790 pipe for S32205",
+            "expectedPatterns": ["A1049.*forging|A790.*pipe", "yield|mechanical"],
+            "category": "comparison"
+          },
+          {
+            "id": "A1049-D08",
+            "query": "What specimen location requirements apply to A1049 large forgings?",
+            "expectedPatterns": ["specimen|location|prolongation|test|forging"],
+            "category": "testing"
+          },
+          {
+            "id": "A1049-D09",
+            "query": "What are the grain size requirements per A1049?",
+            "expectedPatterns": ["grain.*size|ASTM.*No|E112|microstructure"],
+            "category": "microstructure"
+          },
+          {
+            "id": "A1049-D10",
+            "query": "What are the dimensional tolerance requirements for A1049 forgings?",
+            "expectedPatterns": ["tolerance|dimension|machining|allowance"],
+            "category": "dimensional"
+          }
+        ],
+        "edge_case": [
+          {
+            "id": "A1049-EDGE",
+            "query": "What is the creep rupture strength of A1049 duplex at elevated temperature?",
+            "expectedPatterns": ["cannot|not.*(?:in|included|provided)|no.*(?:information|creep)|don't.*have|not.*specified"],
+            "forbiddenPatterns": ["creep.*rupture.*is.*\\d|stress.*rupture.*\\d|\\d+.*MPa.*creep"],
+            "category": "refusal",
+            "notes": "Creep data not in A1049 - duplex not used for high temp creep"
+          }
+        ]
+      }
+    },
+    "ASTM-A789-2013": {
+      "filename": "ASTM A789 Seamless & Welded Duplex Stainless Steel Tubing 2013.pdf",
+      "description": "Seamless and Welded Duplex Stainless Steel Tubing (2013 Edition)",
+      "queries": {
+        "easy": [
+          {
+            "id": "A789-13-E01",
+            "query": "What is the scope of ASTM A789 2013 edition?",
+            "expectedPatterns": ["tubing|tube", "seamless|welded", "ferritic.*austenitic|duplex"],
+            "category": "scope"
+          },
+          {
+            "id": "A789-13-E02",
+            "query": "What is the minimum yield strength of S32205 per A789 2013?",
+            "expectedPatterns": ["70\\s*ksi|485\\s*MPa"],
+            "category": "mechanical"
+          },
+          {
+            "id": "A789-13-E03",
+            "query": "What is the minimum tensile strength of S32205 per A789 2013?",
+            "expectedPatterns": ["95\\s*ksi|655\\s*MPa|90\\s*ksi"],
+            "category": "mechanical"
+          },
+          {
+            "id": "A789-13-E04",
+            "query": "What is the maximum carbon content for S32205 per A789 2013?",
+            "expectedPatterns": ["0\\.030|0\\.03"],
+            "category": "chemical"
+          },
+          {
+            "id": "A789-13-E05",
+            "query": "What product form does A789 2013 cover?",
+            "expectedPatterns": ["tubing|tube"],
+            "category": "scope"
+          },
+          {
+            "id": "A789-13-E06",
+            "query": "What is the chromium range for S32205 per A789 2013?",
+            "expectedPatterns": ["22\\.0.*23\\.0|21\\.0.*23\\.0"],
+            "category": "chemical"
+          },
+          {
+            "id": "A789-13-E07",
+            "query": "What is the maximum hardness for S32205 per A789 2013?",
+            "expectedPatterns": ["290\\s*HBW|293\\s*HBW|31\\s*HRC"],
+            "category": "mechanical"
+          },
+          {
+            "id": "A789-13-E08",
+            "query": "What nickel range is specified for S32205 per A789 2013?",
+            "expectedPatterns": ["4\\.5.*6\\.5|5\\.0.*6\\.0"],
+            "category": "chemical"
+          },
+          {
+            "id": "A789-13-E09",
+            "query": "What molybdenum range is specified for S32205 per A789 2013?",
+            "expectedPatterns": ["3\\.0.*3\\.5|2\\.5.*3\\.5"],
+            "category": "chemical"
+          },
+          {
+            "id": "A789-13-E10",
+            "query": "What heat treatment is required per A789 2013?",
+            "expectedPatterns": ["solution.*anneal|heat.*treat|quench"],
+            "category": "heat_treatment"
+          }
+        ],
+        "medium": [
+          {
+            "id": "A789-13-M01",
+            "query": "What testing methods are required for A789 2013?",
+            "expectedPatterns": ["tension|tensile|flattening|hardness|hydrostatic"],
+            "category": "testing"
+          },
+          {
+            "id": "A789-13-M02",
+            "query": "What supplementary requirements are available in A789 2013?",
+            "expectedPatterns": ["S1|pneumatic|supplementary"],
+            "category": "supplementary"
+          },
+          {
+            "id": "A789-13-M03",
+            "query": "What ASTM standards are referenced by A789 2013?",
+            "expectedPatterns": ["A480|A1016|E527|A370"],
+            "category": "references"
+          },
+          {
+            "id": "A789-13-M04",
+            "query": "What marking requirements apply to A789 2013?",
+            "expectedPatterns": ["marking|heat|lot|grade|manufacturer"],
+            "category": "marking"
+          },
+          {
+            "id": "A789-13-M05",
+            "query": "What dimensional tolerances apply to A789 2013 tubing?",
+            "expectedPatterns": ["OD|outside.*diameter|wall.*thickness|tolerance"],
+            "category": "dimensional"
+          },
+          {
+            "id": "A789-13-M06",
+            "query": "What flattening test requirements apply to A789 2013?",
+            "expectedPatterns": ["flatten|reverse|crack|failure"],
+            "category": "testing"
+          },
+          {
+            "id": "A789-13-M07",
+            "query": "What hydrostatic test requirements apply to A789 2013?",
+            "expectedPatterns": ["hydrostat|pressure|psi|MPa|test"],
+            "category": "testing"
+          },
+          {
+            "id": "A789-13-M08",
+            "query": "What is the minimum elongation for S32205 per A789 2013?",
+            "expectedPatterns": ["25\\s*%|20\\s*%"],
+            "category": "mechanical"
+          },
+          {
+            "id": "A789-13-M09",
+            "query": "What nitrogen range is specified for S32205 per A789 2013?",
+            "expectedPatterns": ["0\\.14.*0\\.20|0\\.08.*0\\.20"],
+            "category": "chemical"
+          },
+          {
+            "id": "A789-13-M10",
+            "query": "What certification requirements apply to A789 2013?",
+            "expectedPatterns": ["certif|report|test.*results|heat|lot"],
+            "category": "certification"
+          }
+        ],
+        "difficult": [
+          {
+            "id": "A789-13-D01",
+            "query": "What are all the UNS designations covered by A789 2013?",
+            "expectedPatterns": ["S31803|S32101|S32205|S32304|S32750|S32760"],
+            "category": "list"
+          },
+          {
+            "id": "A789-13-D02",
+            "query": "What are the complete chemical composition requirements for S32750 per A789 2013?",
+            "expectedPatterns": ["Cr|chromium", "Ni|nickel", "Mo|molybdenum", "N|nitrogen"],
+            "category": "synthesis"
+          },
+          {
+            "id": "A789-13-D03",
+            "query": "Compare the 2013 and 2014 editions of ASTM A789",
+            "expectedPatterns": ["2013|2014|edition|change|update"],
+            "category": "comparison"
+          },
+          {
+            "id": "A789-13-D04",
+            "query": "What specimen requirements apply for tensile testing per A789 2013?",
+            "expectedPatterns": ["specimen|longitudinal|transverse|full.*section|strip"],
+            "category": "testing"
+          },
+          {
+            "id": "A789-13-D05",
+            "query": "What is the complete heat treatment cycle for S31803 per A789 2013?",
+            "expectedPatterns": ["1870.*2010|1020.*1100", "quench|cool", "water|liquid|air"],
+            "category": "heat_treatment"
+          },
+          {
+            "id": "A789-13-D06",
+            "query": "What are the mechanical property requirements for all grades per A789 2013?",
+            "expectedPatterns": ["S31803|S32205|S32750", "yield|tensile|elongation|hardness"],
+            "category": "synthesis"
+          },
+          {
+            "id": "A789-13-D07",
+            "query": "What repair is permitted for A789 2013 tubing?",
+            "expectedPatterns": ["repair|grind|weld|surface|defect"],
+            "category": "repair"
+          },
+          {
+            "id": "A789-13-D08",
+            "query": "What ordering information is required per A789 2013?",
+            "expectedPatterns": ["order|specification|grade|size|quantity"],
+            "category": "ordering"
+          },
+          {
+            "id": "A789-13-D09",
+            "query": "What acceptance criteria apply to A789 2013 tubing?",
+            "expectedPatterns": ["acceptance|reject|defect|surface|dimension"],
+            "category": "quality"
+          },
+          {
+            "id": "A789-13-D10",
+            "query": "What flare testing requirements apply to A789 2013?",
+            "expectedPatterns": ["flare|flange|expand|crack"],
+            "category": "testing"
+          }
+        ],
+        "edge_case": [
+          {
+            "id": "A789-13-EDGE",
+            "query": "What is the stress corrosion cracking threshold for A789 2013 tubing?",
+            "expectedPatterns": ["cannot|not.*(?:in|included|provided)|no.*(?:information|SCC|threshold)|don't.*have|not.*specified"],
+            "forbiddenPatterns": ["KISCC|threshold.*=|stress.*intensity"],
+            "category": "refusal",
+            "notes": "SCC threshold data not in A789 specification"
+          }
+        ]
+      }
+    },
+    "ASTM-A790-2014": {
+      "filename": "ASTM A790 Seamless & Welded Duplex Stainless Steel Pipe 2014.pdf",
+      "description": "Seamless and Welded Duplex Stainless Steel Pipe (2014 Edition)",
+      "queries": {
+        "easy": [
+          {
+            "id": "A790-14-E01",
+            "query": "What is the scope of ASTM A790 2014 edition?",
+            "expectedPatterns": ["pipe", "seamless|welded", "ferritic.*austenitic|duplex"],
+            "category": "scope"
+          },
+          {
+            "id": "A790-14-E02",
+            "query": "What is the minimum yield strength of S32205 per A790 2014?",
+            "expectedPatterns": ["65\\s*ksi|450\\s*MPa"],
+            "category": "mechanical"
+          },
+          {
+            "id": "A790-14-E03",
+            "query": "What is the minimum tensile strength of S32205 per A790 2014?",
+            "expectedPatterns": ["90\\s*ksi|620\\s*MPa"],
+            "category": "mechanical"
+          },
+          {
+            "id": "A790-14-E04",
+            "query": "What is the maximum carbon content for S32205 per A790 2014?",
+            "expectedPatterns": ["0\\.030|0\\.03"],
+            "category": "chemical"
+          },
+          {
+            "id": "A790-14-E05",
+            "query": "What product form does A790 2014 cover?",
+            "expectedPatterns": ["pipe"],
+            "category": "scope"
+          },
+          {
+            "id": "A790-14-E06",
+            "query": "What is the chromium range for S32205 per A790 2014?",
+            "expectedPatterns": ["22\\.0.*23\\.0|21\\.0.*23\\.0"],
+            "category": "chemical"
+          },
+          {
+            "id": "A790-14-E07",
+            "query": "What is the maximum hardness for S32205 per A790 2014?",
+            "expectedPatterns": ["290\\s*HBW|293\\s*HBW|31\\s*HRC"],
+            "category": "mechanical"
+          },
+          {
+            "id": "A790-14-E08",
+            "query": "What nickel range is specified for S32205 per A790 2014?",
+            "expectedPatterns": ["4\\.5.*6\\.5|5\\.0.*6\\.0"],
+            "category": "chemical"
+          },
+          {
+            "id": "A790-14-E09",
+            "query": "What molybdenum range is specified for S32205 per A790 2014?",
+            "expectedPatterns": ["3\\.0.*3\\.5|2\\.5.*3\\.5"],
+            "category": "chemical"
+          },
+          {
+            "id": "A790-14-E10",
+            "query": "What heat treatment is required per A790 2014?",
+            "expectedPatterns": ["solution.*anneal|heat.*treat|quench"],
+            "category": "heat_treatment"
+          }
+        ],
+        "medium": [
+          {
+            "id": "A790-14-M01",
+            "query": "What testing methods are required for A790 2014?",
+            "expectedPatterns": ["tension|tensile|flattening|hardness|hydrostatic"],
+            "category": "testing"
+          },
+          {
+            "id": "A790-14-M02",
+            "query": "What supplementary requirements are available in A790 2014?",
+            "expectedPatterns": ["S1|S2|S3|S4|supplementary"],
+            "category": "supplementary"
+          },
+          {
+            "id": "A790-14-M03",
+            "query": "What ASTM standards are referenced by A790 2014?",
+            "expectedPatterns": ["A370|A923|A999|A1016|ANSI|B36|referenced|standard"],
+            "category": "references"
+          },
+          {
+            "id": "A790-14-M04",
+            "query": "What NDE methods are specified for A790 2014 pipe?",
+            "expectedPatterns": ["ultrasonic|eddy.*current|hydrostatic|UT|ET"],
+            "category": "testing"
+          },
+          {
+            "id": "A790-14-M05",
+            "query": "What marking requirements apply to A790 2014?",
+            "expectedPatterns": ["marking|heat|lot|grade|manufacturer"],
+            "category": "marking"
+          },
+          {
+            "id": "A790-14-M06",
+            "query": "What quenching methods are permitted per A790 2014?",
+            "expectedPatterns": ["water|liquid|air|spray|mist|quench"],
+            "category": "heat_treatment"
+          },
+          {
+            "id": "A790-14-M07",
+            "query": "What flattening test requirements apply to A790 2014?",
+            "expectedPatterns": ["flatten|crack|failure|D/t"],
+            "category": "testing"
+          },
+          {
+            "id": "A790-14-M08",
+            "query": "What is the minimum elongation for S32205 per A790 2014?",
+            "expectedPatterns": ["25\\s*%|20\\s*%"],
+            "category": "mechanical"
+          },
+          {
+            "id": "A790-14-M09",
+            "query": "What nitrogen range is specified for S32205 per A790 2014?",
+            "expectedPatterns": ["0\\.14.*0\\.20|0\\.08.*0\\.20"],
+            "category": "chemical"
+          },
+          {
+            "id": "A790-14-M10",
+            "query": "What certification requirements apply to A790 2014?",
+            "expectedPatterns": ["certif|report|test.*results|heat|lot"],
+            "category": "certification"
+          }
+        ],
+        "difficult": [
+          {
+            "id": "A790-14-D01",
+            "query": "Compare the 2014 and 2024 editions of ASTM A790",
+            "expectedPatterns": ["2014|2024|edition|change|update"],
+            "category": "comparison"
+          },
+          {
+            "id": "A790-14-D02",
+            "query": "What are all the UNS designations covered by A790 2014?",
+            "expectedPatterns": ["S31803|S32101|S32205|S32304|S32750|S32760"],
+            "category": "list"
+          },
+          {
+            "id": "A790-14-D03",
+            "query": "What are the complete chemical composition requirements for S32750 per A790 2014?",
+            "expectedPatterns": ["Cr|chromium|chemical", "cannot|not.*provided|Ni|nickel|Mo|molybdenum"],
+            "category": "synthesis"
+          },
+          {
+            "id": "A790-14-D04",
+            "query": "What specimen requirements apply for tensile testing per A790 2014?",
+            "expectedPatterns": ["specimen|longitudinal|transverse|full.*section|strip"],
+            "category": "testing"
+          },
+          {
+            "id": "A790-14-D05",
+            "query": "What is the complete heat treatment cycle for S31803 per A790 2014?",
+            "expectedPatterns": ["1870|1020|anneal|heat.*treat|cannot", "quench|cool|water|liquid|air|not.*specified"],
+            "category": "heat_treatment"
+          },
+          {
+            "id": "A790-14-D06",
+            "query": "What wall thickness tolerances apply to A790 2014 pipe?",
+            "expectedPatterns": ["tolerance|wall|minimum|12\\.5|%"],
+            "category": "dimensional"
+          },
+          {
+            "id": "A790-14-D07",
+            "query": "What welding procedures are addressed in A790 2014?",
+            "expectedPatterns": ["Section\\s*15|weld|repair|manufacturer"],
+            "category": "welding"
+          },
+          {
+            "id": "A790-14-D08",
+            "query": "What are the mechanical property requirements for all grades per A790 2014?",
+            "expectedPatterns": ["S31803|S32205|S32750", "yield|tensile|elongation"],
+            "category": "synthesis"
+          },
+          {
+            "id": "A790-14-D09",
+            "query": "What hydrostatic test requirements apply to A790 2014?",
+            "expectedPatterns": ["hydrostat|pressure|psi|MPa|formula"],
+            "category": "testing"
+          },
+          {
+            "id": "A790-14-D10",
+            "query": "What ordering information is required per A790 2014?",
+            "expectedPatterns": ["order|specification|grade|size|schedule"],
+            "category": "ordering"
+          }
+        ],
+        "edge_case": [
+          {
+            "id": "A790-14-EDGE",
+            "query": "What is the thermal expansion coefficient for A790 2014 duplex pipe?",
+            "expectedPatterns": ["cannot|not.*(?:in|included|provided)|no.*(?:information|thermal.*expansion)|don't.*have|not.*specified"],
+            "forbiddenPatterns": ["thermal.*expansion.*=|coefficient.*=|in/in|mm/mm"],
+            "category": "refusal",
+            "notes": "Thermal expansion not in A790 specification"
+          }
+        ]
+      }
+    },
+    "ASTM-A790-2014-alt": {
+      "filename": "ASTM A790 Seamless & Welded Duplex Pipe 2014.pdf",
+      "description": "Seamless and Welded Duplex Pipe (Alternative 2014 Document)",
+      "queries": {
+        "easy": [
+          {
+            "id": "A790-14b-E01",
+            "query": "What is the scope of this A790 document?",
+            "expectedPatterns": ["pipe", "seamless|welded", "duplex"],
+            "category": "scope"
+          },
+          {
+            "id": "A790-14b-E02",
+            "query": "What grades are covered?",
+            "expectedPatterns": ["S32205|S32750|S31803|duplex"],
+            "category": "scope"
+          },
+          {
+            "id": "A790-14b-E03",
+            "query": "What is the yield strength requirement for duplex grades?",
+            "expectedPatterns": ["65\\s*ksi|450\\s*MPa|60\\s*ksi"],
+            "category": "mechanical"
+          },
+          {
+            "id": "A790-14b-E04",
+            "query": "What is the carbon limit for duplex grades?",
+            "expectedPatterns": ["0\\.030|0\\.03"],
+            "category": "chemical"
+          },
+          {
+            "id": "A790-14b-E05",
+            "query": "What is the chromium content for duplex grades?",
+            "expectedPatterns": ["22|23|21|Cr"],
+            "category": "chemical"
+          },
+          {
+            "id": "A790-14b-E06",
+            "query": "What heat treatment is specified?",
+            "expectedPatterns": ["solution|anneal|quench"],
+            "category": "heat_treatment"
+          },
+          {
+            "id": "A790-14b-E07",
+            "query": "What is the hardness requirement?",
+            "expectedPatterns": ["290|293|HBW|HRC"],
+            "category": "mechanical"
+          },
+          {
+            "id": "A790-14b-E08",
+            "query": "What is the nickel content for duplex grades?",
+            "expectedPatterns": ["4\\.5|5\\.0|6\\.0|Ni"],
+            "category": "chemical"
+          },
+          {
+            "id": "A790-14b-E09",
+            "query": "What is the molybdenum content?",
+            "expectedPatterns": ["2\\.5|3\\.0|3\\.5|Mo"],
+            "category": "chemical"
+          },
+          {
+            "id": "A790-14b-E10",
+            "query": "What is the nitrogen content for duplex grades?",
+            "expectedPatterns": ["0\\.14|0\\.20|N"],
+            "category": "chemical"
+          }
+        ],
+        "medium": [
+          {
+            "id": "A790-14b-M01",
+            "query": "What testing is required for this specification?",
+            "expectedPatterns": ["tension|tensile|hardness|hydrostatic|flattening|test|cannot"],
+            "category": "testing"
+          },
+          {
+            "id": "A790-14b-M02",
+            "query": "What NDE is required?",
+            "expectedPatterns": ["ultrasonic|eddy.*current|UT|ET|NDE"],
+            "category": "testing"
+          },
+          {
+            "id": "A790-14b-M03",
+            "query": "What marking is required?",
+            "expectedPatterns": ["heat|lot|grade|size|marking"],
+            "category": "marking"
+          },
+          {
+            "id": "A790-14b-M04",
+            "query": "What supplementary requirements are available?",
+            "expectedPatterns": ["S1|S2|S3|S4|supplementary"],
+            "category": "supplementary"
+          },
+          {
+            "id": "A790-14b-M05",
+            "query": "What quenching is permitted?",
+            "expectedPatterns": ["water|liquid|air|quench"],
+            "category": "heat_treatment"
+          },
+          {
+            "id": "A790-14b-M06",
+            "query": "What elongation is required?",
+            "expectedPatterns": ["25|20|%|elongation"],
+            "category": "mechanical"
+          },
+          {
+            "id": "A790-14b-M07",
+            "query": "What tensile strength is required?",
+            "expectedPatterns": ["90|620|ksi|MPa|tensile"],
+            "category": "mechanical"
+          },
+          {
+            "id": "A790-14b-M08",
+            "query": "What certification is required?",
+            "expectedPatterns": ["certif|report|test.*results"],
+            "category": "certification"
+          },
+          {
+            "id": "A790-14b-M09",
+            "query": "What flattening test is required?",
+            "expectedPatterns": ["flatten|crack|failure"],
+            "category": "testing"
+          },
+          {
+            "id": "A790-14b-M10",
+            "query": "What hydrostatic test is required?",
+            "expectedPatterns": ["hydrostatic|pressure|psi|MPa"],
+            "category": "testing"
+          }
+        ],
+        "difficult": [
+          {
+            "id": "A790-14b-D01",
+            "query": "What are all the grades and their yield strengths?",
+            "expectedPatterns": ["S32205|S32750|65|80|yield|ksi"],
+            "category": "list"
+          },
+          {
+            "id": "A790-14b-D02",
+            "query": "What is the complete chemical composition for S32205?",
+            "expectedPatterns": ["Cr|Ni|Mo|N|C"],
+            "category": "synthesis"
+          },
+          {
+            "id": "A790-14b-D03",
+            "query": "What is the complete heat treatment cycle?",
+            "expectedPatterns": ["1870|1020|quench|cool|temperature"],
+            "category": "heat_treatment"
+          },
+          {
+            "id": "A790-14b-D04",
+            "query": "What are all the test requirements?",
+            "expectedPatterns": ["tension|hardness|flattening|hydrostatic|NDE|test|cannot"],
+            "category": "synthesis"
+          },
+          {
+            "id": "A790-14b-D05",
+            "query": "What dimensional tolerances apply?",
+            "expectedPatterns": ["tolerance|wall|OD|minimum|maximum"],
+            "category": "dimensional"
+          },
+          {
+            "id": "A790-14b-D06",
+            "query": "Compare S32205 and S32750 properties",
+            "expectedPatterns": ["S32205|S32750|yield|tensile|chromium"],
+            "category": "comparison"
+          },
+          {
+            "id": "A790-14b-D07",
+            "query": "What are the welding requirements?",
+            "expectedPatterns": ["weld|repair|Section.*15|manufacturer"],
+            "category": "welding"
+          },
+          {
+            "id": "A790-14b-D08",
+            "query": "What are all the UNS designations?",
+            "expectedPatterns": ["S31803|S32205|S32750|S32760|UNS"],
+            "category": "list"
+          },
+          {
+            "id": "A790-14b-D09",
+            "query": "What specimen requirements apply to testing?",
+            "expectedPatterns": ["specimen|longitudinal|transverse|location"],
+            "category": "testing"
+          },
+          {
+            "id": "A790-14b-D10",
+            "query": "What ordering information is needed?",
+            "expectedPatterns": ["order|specification|grade|size|quantity"],
+            "category": "ordering"
+          }
+        ],
+        "edge_case": [
+          {
+            "id": "A790-14b-EDGE",
+            "query": "What is the cost per linear foot for this pipe?",
+            "expectedPatterns": ["cannot|not.*(?:in|included|provided)|no.*(?:information|price)|don't.*have|not.*specified"],
+            "forbiddenPatterns": ["\\$\\d|USD\\s*\\d|cost.*is.*\\$|\\d+.*per.*foot"],
+            "category": "refusal",
+            "notes": "Pricing never in specifications"
+          }
+        ]
+      }
+    }
+  }
+}

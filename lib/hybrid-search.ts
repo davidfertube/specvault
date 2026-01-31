@@ -66,21 +66,35 @@ export interface SearchMetadata {
  *
  * @param query - The user's search query
  * @param matchCount - Maximum number of results to return (default: 5)
+ * @param documentIds - Optional array of document IDs to filter to (for spec-specific queries)
  * @returns Array of search results sorted by combined score
  *
  * @example
+ * // Search all documents
  * const results = await hybridSearchChunks("UNS S31803 yield strength");
- * // Returns chunks matching "S31803" with high BM25 score
+ *
+ * @example
+ * // Search only A790 document (ID 5)
+ * const results = await hybridSearchChunks("S32205 yield per A790", 5, [5]);
  */
 export async function hybridSearchChunks(
   query: string,
-  matchCount: number = 5
+  matchCount: number = 5,
+  documentIds: number[] | null = null
 ): Promise<HybridSearchResult[]> {
   const startTime = Date.now();
 
   // Step 1: Preprocess query to extract codes and determine strategy
   const processed = preprocessQuery(query);
+
+  // Step 2: Adaptive weighting based on query characteristics
+  // Always use the intelligent weighting from query-preprocessing
+  // This handles codes, property keywords, and chemical elements
   const weights = getSearchWeights(processed);
+
+  if (processed.boostExactMatch) {
+    console.log(`[Hybrid Search] Boost mode: BM25=${weights.bm25Weight}, Vector=${weights.vectorWeight} for codes: ${formatExtractedCodes(processed.extractedCodes)}`);
+  }
 
   // Log search strategy for debugging
   if (processed.boostExactMatch) {
@@ -93,15 +107,25 @@ export async function hybridSearchChunks(
   }
 
   // Step 2: Generate embedding for vector search (cached for repeat queries)
-  const embedding = await getCachedQueryEmbedding(query);
+  // Use the expanded semantic query for better element matching
+  const searchQuery = processed.semanticQuery;
+  const embedding = await getCachedQueryEmbedding(searchQuery);
+
+  // Log document filter if applied
+  if (documentIds && documentIds.length > 0) {
+    console.log(`[Hybrid Search] Filtering to documents: [${documentIds.join(", ")}]`);
+  }
 
   // Step 3: Call hybrid search function in Supabase
+  // Use expanded query for BM25 text matching (e.g., "nitrogen N" matches both)
+  // Pass document filter if provided (for spec-specific queries like "per A790")
   const { data, error } = await supabase.rpc("hybrid_search_chunks", {
-    query_text: query,
+    query_text: searchQuery,
     query_embedding: embedding,
     match_count: matchCount,
     bm25_weight: weights.bm25Weight,
     vector_weight: weights.vectorWeight,
+    filter_document_ids: documentIds,
   });
 
   if (error) {
@@ -136,14 +160,16 @@ export async function hybridSearchChunks(
  *
  * @param query - The user's search query
  * @param matchCount - Maximum number of results to return (default: 5)
+ * @param documentIds - Optional array of document IDs to filter to
  * @returns Array of search results
  */
 export async function searchWithFallback(
   query: string,
-  matchCount: number = 5
+  matchCount: number = 5,
+  documentIds: number[] | null = null
 ): Promise<HybridSearchResult[]> {
   try {
-    return await hybridSearchChunks(query, matchCount);
+    return await hybridSearchChunks(query, matchCount, documentIds);
   } catch (error) {
     console.warn(
       "[Hybrid Search] Falling back to vector-only search:",

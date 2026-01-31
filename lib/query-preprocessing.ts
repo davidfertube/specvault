@@ -18,18 +18,18 @@ export interface ProcessedQuery {
   /** Query for vector embedding (usually same as original) */
   semanticQuery: string;
 
-  /** Technical codes extracted from query */
+  /** Technical codes extracted from query (ALL matches, not just first) */
   extractedCodes: {
-    /** UNS numbers (S31803, N08825, etc.) */
-    uns?: string;
-    /** ASTM standards (A790, A789, etc.) */
-    astm?: string;
-    /** API standards (5L, 5CT, etc.) */
-    api?: string;
-    /** Common grades (2205, 316L, etc.) */
-    grade?: string;
-    /** NACE references (MR0175, etc.) */
-    nace?: string;
+    /** UNS numbers (S31803, N08825, etc.) - ALL found in query */
+    uns?: string[];
+    /** ASTM standards (A790, A789, etc.) - ALL found in query */
+    astm?: string[];
+    /** API standards (5L, 5CT, etc.) - ALL found in query */
+    api?: string[];
+    /** Common grades (2205, 316L, etc.) - ALL found in query */
+    grade?: string[];
+    /** NACE references (MR0175, etc.) - ALL found in query */
+    nace?: string[];
   };
 
   /** True if query contains technical codes that benefit from BM25 */
@@ -90,6 +90,7 @@ const ISO_15156_PATTERN = /\bISO\s*15156(?:-\d+)?\b/gi;
  * These often appear verbatim in spec tables
  */
 const PROPERTY_KEYWORDS = [
+  // Mechanical properties
   "yield",
   "tensile",
   "elongation",
@@ -108,7 +109,131 @@ const PROPERTY_KEYWORDS = [
   "solution",
   "quench",
   "temper",
+  // Chemical elements (critical for composition queries)
+  "nitrogen",
+  "chromium",
+  "molybdenum",
+  "nickel",
+  "carbon",
+  "manganese",
+  "phosphorus",
+  "phosphorous",
+  "sulfur",
+  "silicon",
+  "copper",
+  "tungsten",
+  "cobalt",
+  "vanadium",
+  "titanium",
+  "niobium",
+  "columbium",
+  "aluminum",
+  "boron",
+  // Element symbols (for exact table matching)
+  "cr",
+  "mo",
+  "ni",
+  "mn",
+  "si",
+  "cu",
+  "co",
+  "ti",
+  "nb",
+  "al",
+  // Heat treatment
+  "temperature",
+  "quenching",
+  "cooling",
+  // Additional technical terms
+  "chemical",
+  "composition",
+  "requirements",
+  "minimum",
+  "maximum",
+  "thickness",
+  "tolerance",
+  "permissible",
 ];
+
+/**
+ * Domain-specific synonyms for query expansion
+ * Expands technical terms to include related terms that may appear in specs
+ * E.g., "yield" → "yield strength Ys 0.2% proof"
+ */
+const DOMAIN_SYNONYMS: Record<string, string[]> = {
+  // Mechanical properties
+  yield: ["yield strength", "Ys", "0.2% proof", "offset yield"],
+  tensile: ["tensile strength", "UTS", "ultimate tensile", "Rm"],
+  hardness: ["HBW", "HRC", "Brinell", "Rockwell", "HV", "Vickers"],
+  elongation: ["elongation at break", "El", "%El", "A%"],
+  impact: ["Charpy", "impact test", "CVN", "notch toughness"],
+  // Heat treatment terms
+  annealing: ["solution anneal", "solution treatment", "heat treatment"],
+  quench: ["quenching", "water quench", "rapid cooling"],
+  // Document reference terms
+  scope: ["coverage", "applicability", "specification covers"],
+  requirements: ["shall", "must", "mandatory", "required"],
+};
+
+/**
+ * Expand query with domain-specific synonyms
+ * E.g., "minimum yield" → "minimum yield yield strength Ys 0.2% proof"
+ */
+function expandQueryWithSynonyms(query: string): string {
+  let expanded = query;
+  const lowerQuery = query.toLowerCase();
+
+  for (const [term, synonyms] of Object.entries(DOMAIN_SYNONYMS)) {
+    if (lowerQuery.includes(term)) {
+      // Add synonyms at the end of the query for vector search context
+      expanded += ` ${synonyms.join(" ")}`;
+    }
+  }
+  return expanded;
+}
+
+/**
+ * Element name to symbol mapping for expanding queries
+ * When a user asks about "nitrogen content", we also search for "N"
+ */
+const ELEMENT_EXPANSIONS: Record<string, string> = {
+  nitrogen: "N",
+  chromium: "Cr",
+  molybdenum: "Mo",
+  nickel: "Ni",
+  carbon: "C",
+  manganese: "Mn",
+  phosphorus: "P",
+  phosphorous: "P",
+  sulfur: "S",
+  silicon: "Si",
+  copper: "Cu",
+  tungsten: "W",
+  cobalt: "Co",
+  vanadium: "V",
+  titanium: "Ti",
+  niobium: "Nb",
+  columbium: "Nb",
+  aluminum: "Al",
+  boron: "B",
+  iron: "Fe",
+};
+
+/**
+ * Expand element names in query to include their symbols
+ * E.g., "nitrogen content" → "nitrogen N content"
+ */
+function expandElementNames(query: string): string {
+  let expanded = query;
+  for (const [name, symbol] of Object.entries(ELEMENT_EXPANSIONS)) {
+    const regex = new RegExp(`\\b${name}\\b`, "gi");
+    if (regex.test(query)) {
+      // Add the symbol after the element name
+      expanded = expanded.replace(regex, `${name} ${symbol}`);
+    }
+  }
+  return expanded;
+}
 
 // ============================================================================
 // Main Functions
@@ -132,6 +257,10 @@ const PROPERTY_KEYWORDS = [
  */
 export function preprocessQuery(query: string): ProcessedQuery {
   const original = query.trim();
+  // Expand element names to include symbols (e.g., "nitrogen" → "nitrogen N")
+  let expandedQuery = expandElementNames(original);
+  // Expand with domain synonyms (e.g., "yield" → "yield yield strength Ys 0.2% proof")
+  expandedQuery = expandQueryWithSynonyms(expandedQuery);
   const upperQuery = original.toUpperCase();
 
   // Extract all technical codes
@@ -172,16 +301,33 @@ export function preprocessQuery(query: string): ProcessedQuery {
   // Deduplicate keywords
   const uniqueKeywords = [...new Set(keywords)];
 
+  // Deduplicate and uppercase all extracted codes
+  const uniqueUns = unsMatches.length > 0
+    ? [...new Set(unsMatches.map(m => m.toUpperCase()))]
+    : undefined;
+  const uniqueAstm = astmMatches.length > 0
+    ? [...new Set(astmMatches.map(m => m.toUpperCase()))]
+    : undefined;
+  const uniqueApi = apiMatches.length > 0
+    ? [...new Set(apiMatches.map(m => m.toUpperCase()))]
+    : undefined;
+  const uniqueGrade = gradeMatches.length > 0
+    ? [...new Set(gradeMatches.map(m => m.toUpperCase()))]
+    : undefined;
+  const uniqueNace = naceMatches.length > 0
+    ? [...new Set(naceMatches.map(m => m.toUpperCase()))]
+    : undefined;
+
   return {
     original,
     keywords: uniqueKeywords,
-    semanticQuery: original,
+    semanticQuery: expandedQuery, // Use expanded query with element symbols
     extractedCodes: {
-      uns: unsMatches[0]?.toUpperCase(),
-      astm: astmMatches[0]?.toUpperCase(),
-      api: apiMatches[0]?.toUpperCase(),
-      grade: gradeMatches[0]?.toUpperCase(),
-      nace: naceMatches[0]?.toUpperCase(),
+      uns: uniqueUns,
+      astm: uniqueAstm,
+      api: uniqueApi,
+      grade: uniqueGrade,
+      nace: uniqueNace,
     },
     boostExactMatch: hasExactCodes || hasPropertyKeywords,
   };
@@ -201,23 +347,36 @@ export function getSearchWeights(query: ProcessedQuery): {
   bm25Weight: number;
   vectorWeight: number;
 } {
-  // Count how many code types were found
+  // Count how many code types were found (each array counts as 1 type)
   const codeCount = [
-    query.extractedCodes.uns,
-    query.extractedCodes.astm,
-    query.extractedCodes.api,
-    query.extractedCodes.grade,
-    query.extractedCodes.nace,
-  ].filter(Boolean).length;
+    query.extractedCodes.uns?.length ?? 0,
+    query.extractedCodes.astm?.length ?? 0,
+    query.extractedCodes.api?.length ?? 0,
+    query.extractedCodes.grade?.length ?? 0,
+    query.extractedCodes.nace?.length ?? 0,
+  ].filter(count => count > 0).length;
+
+  // Also count total individual codes for weighting
+  const totalCodes =
+    (query.extractedCodes.uns?.length ?? 0) +
+    (query.extractedCodes.astm?.length ?? 0) +
+    (query.extractedCodes.api?.length ?? 0) +
+    (query.extractedCodes.grade?.length ?? 0) +
+    (query.extractedCodes.nace?.length ?? 0);
 
   if (codeCount >= 2) {
     // Multiple codes → Heavy BM25 weight
+    return { bm25Weight: 0.7, vectorWeight: 0.3 };
+  }
+
+  if (codeCount === 1) {
+    // Single code → Strong BM25 for exact matching
     return { bm25Weight: 0.6, vectorWeight: 0.4 };
   }
 
-  if (codeCount === 1 || query.boostExactMatch) {
-    // Single code or property keywords → Balanced
-    return { bm25Weight: 0.5, vectorWeight: 0.5 };
+  if (query.boostExactMatch) {
+    // Property/element keywords → Moderate BM25 boost
+    return { bm25Weight: 0.55, vectorWeight: 0.45 };
   }
 
   // Pure semantic query → Favor vector
@@ -358,10 +517,32 @@ export function formatExtractedCodes(
   codes: ProcessedQuery["extractedCodes"]
 ): string {
   const parts: string[] = [];
-  if (codes.uns) parts.push(`UNS: ${codes.uns}`);
-  if (codes.astm) parts.push(`ASTM: ${codes.astm}`);
-  if (codes.api) parts.push(`API: ${codes.api}`);
-  if (codes.grade) parts.push(`Grade: ${codes.grade}`);
-  if (codes.nace) parts.push(`NACE: ${codes.nace}`);
+  if (codes.uns?.length) parts.push(`UNS: ${codes.uns.join(", ")}`);
+  if (codes.astm?.length) parts.push(`ASTM: ${codes.astm.join(", ")}`);
+  if (codes.api?.length) parts.push(`API: ${codes.api.join(", ")}`);
+  if (codes.grade?.length) parts.push(`Grade: ${codes.grade.join(", ")}`);
+  if (codes.nace?.length) parts.push(`NACE: ${codes.nace.join(", ")}`);
   return parts.length > 0 ? parts.join(", ") : "none";
+}
+
+/**
+ * Get the primary ASTM code from extracted codes (first one)
+ * Used for backwards compatibility where only one code is needed
+ */
+export function getPrimaryAstmCode(
+  codes: ProcessedQuery["extractedCodes"]
+): string | undefined {
+  return codes.astm?.[0];
+}
+
+/**
+ * Check if query mentions a specific specification
+ * Used for document filtering
+ */
+export function mentionsSpec(
+  codes: ProcessedQuery["extractedCodes"],
+  spec: string
+): boolean {
+  const upperSpec = spec.toUpperCase();
+  return codes.astm?.some(a => a.includes(upperSpec)) ?? false;
 }

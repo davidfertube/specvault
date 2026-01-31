@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
-import { generateEmbeddingsParallel } from "@/lib/embeddings";
+import { generateEmbeddings } from "@/lib/embeddings";
 import { storeChunks } from "@/lib/vectorstore";
 import { extractText } from "unpdf";
 import { handleApiError, createValidationError, createEmbeddingError, getErrorStatusCode } from "@/lib/errors";
 import { extractTextWithOCR, shouldAttemptOCR } from "@/lib/ocr";
+import { semanticChunk, DEFAULT_CHUNK_OPTIONS } from "@/lib/semantic-chunking";
 
 /**
  * Document Processing API Route
@@ -39,7 +40,9 @@ import { extractTextWithOCR, shouldAttemptOCR } from "@/lib/ocr";
  * @returns Array of text chunks
  * @throws Error if parameters are invalid
  */
-function chunkText(
+// Legacy chunking function - kept for potential fallback use
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function _chunkText(
   text: string,
   chunkSize: number = 1000,
   overlap: number = 200
@@ -246,37 +249,11 @@ export async function POST(request: NextRequest) {
     console.log(`[Process API] Extracted ${pageTexts.length} pages from document ${documentId}${usedOCR ? " (via OCR)" : ""}`);
 
     // ========================================
-    // Step 6: Chunk the Text (Per Page for Accuracy)
+    // Step 6: Semantic Chunking (Preserves Structure)
     // ========================================
-    interface PageChunk {
-      content: string;
-      page_number: number;
-      char_offset_start: number;
-      char_offset_end: number;
-    }
+    console.log(`[Process API] Starting semantic chunking for document ${documentId}...`);
 
-    const allChunks: PageChunk[] = [];
-
-    for (let pageIndex = 0; pageIndex < pageTexts.length; pageIndex++) {
-      const pageText = pageTexts[pageIndex] || "";
-      if (pageText.trim().length < 50) continue; // Skip nearly empty pages
-
-      const pageNumber = pageIndex + 1; // 1-indexed page numbers
-      const pageChunks = chunkText(pageText, 2000, 300);
-
-      for (const chunkContent of pageChunks) {
-        // Find the offset of this chunk within the page
-        const charOffsetStart = pageText.indexOf(chunkContent);
-        const charOffsetEnd = charOffsetStart + chunkContent.length;
-
-        allChunks.push({
-          content: chunkContent,
-          page_number: pageNumber,
-          char_offset_start: charOffsetStart >= 0 ? charOffsetStart : 0,
-          char_offset_end: charOffsetEnd,
-        });
-      }
-    }
+    const allChunks = semanticChunk(pageTexts, DEFAULT_CHUNK_OPTIONS);
 
     if (allChunks.length === 0) {
       console.error("[Process API] No valid chunks generated from document:", documentId);
@@ -287,7 +264,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(error, { status: getErrorStatusCode("VALIDATION_ERROR") });
     }
 
-    console.log(`[Process API] Generated ${allChunks.length} chunks across ${pageTexts.length} pages for document ${documentId}`);
+    console.log(`[Process API] Generated ${allChunks.length} semantic chunks for document ${documentId}`);
+    console.log(`[Process API] Chunk type breakdown:`, {
+      text: allChunks.filter(c => c.metadata.chunk_type === 'text').length,
+      table: allChunks.filter(c => c.metadata.chunk_type === 'table').length,
+      list: allChunks.filter(c => c.metadata.chunk_type === 'list').length,
+      heading: allChunks.filter(c => c.metadata.chunk_type === 'heading').length,
+      withCodes: allChunks.filter(c => c.metadata.has_codes).length,
+    });
 
     // ========================================
     // Step 7: Generate Embeddings
@@ -295,8 +279,8 @@ export async function POST(request: NextRequest) {
     const chunkContents = allChunks.map(c => c.content);
     let embeddings: number[][];
     try {
-      // Use parallel embedding with batch size 10 for faster processing
-      embeddings = await generateEmbeddingsParallel(chunkContents, 10);
+      // Generate embeddings in batches
+      embeddings = await generateEmbeddings(chunkContents);
     } catch (embeddingError) {
       console.error("[Process API] Embedding generation failed:", embeddingError);
       await updateDocumentStatus(documentId, "error");
@@ -315,25 +299,30 @@ export async function POST(request: NextRequest) {
     }
 
     // ========================================
-    // Step 8: Store Chunks with Embeddings
+    // Step 8: Store Chunks with Embeddings and Metadata
     // ========================================
     const chunks = allChunks.map((chunk, index) => ({
       document_id: documentId!,
       content: chunk.content,
-      page_number: chunk.page_number, // ACTUAL page number from PDF
+      page_number: chunk.metadata.page_number,
       char_offset_start: chunk.char_offset_start,
       char_offset_end: chunk.char_offset_end,
+      section_title: chunk.metadata.section_title,
+      chunk_type: chunk.metadata.chunk_type,
+      has_codes: chunk.metadata.has_codes,
+      parent_section: chunk.metadata.parent_section,
       embedding: embeddings[index],
     }));
 
     try {
       await storeChunks(chunks);
     } catch (storageError) {
-      console.error("[Process API] Chunk storage failed:", storageError);
-      await updateDocumentStatus(documentId, "error");
-      // Show actual database error for debugging
+      // Log full error for debugging (server-side only)
       const errorMessage = storageError instanceof Error ? storageError.message : "Unknown database error";
-      const error = createValidationError(`Storage error: ${errorMessage}`);
+      console.error(`[Process API] Chunk storage failed for document ${documentId}:`, errorMessage);
+      await updateDocumentStatus(documentId, "error");
+      // Return safe, user-friendly message (never expose DB internals)
+      const error = createValidationError("Failed to store document chunks. Please try again.");
       return NextResponse.json(error, { status: getErrorStatusCode("INTERNAL_ERROR") });
     }
 

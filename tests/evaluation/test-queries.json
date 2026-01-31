@@ -1,0 +1,235 @@
+{
+  "metadata": {
+    "version": "1.0",
+    "created": "2026-01-30",
+    "description": "Golden test queries for baseline vs RAG evaluation",
+    "categories": {
+      "A": "Direct Lookup - Single value retrieval",
+      "B": "Code Interpretation - Understanding requirements",
+      "C": "Comparison - Multi-value comparison",
+      "D": "Complex/Multi-Part - Multi-table synthesis",
+      "E": "Hallucination Detection - Should refuse to answer"
+    }
+  },
+  "testCases": [
+    {
+      "id": "A790-T1",
+      "query": "What is the minimum yield strength of S32205 duplex stainless steel pipe per ASTM A790?",
+      "expectedPatterns": ["65\\s*ksi|450\\s*MPa", "S32205"],
+      "forbiddenPatterns": ["70\\s*ksi|485\\s*MPa"],
+      "requiredCitations": ["A790"],
+      "category": "lookup",
+      "categoryLetter": "A",
+      "documents": ["A790"],
+      "difficulty": "easy",
+      "notes": "Basic yield strength lookup from Table 2"
+    },
+    {
+      "id": "A790-T2",
+      "query": "What is the maximum carbon content for S32750 super duplex per A790?",
+      "expectedPatterns": ["0\\.030", "carbon", "S32750"],
+      "requiredCitations": ["A790"],
+      "category": "lookup",
+      "categoryLetter": "A",
+      "documents": ["A790"],
+      "difficulty": "easy",
+      "notes": "Chemical composition from Table 1"
+    },
+    {
+      "id": "A790-T3",
+      "query": "What is the heat treatment temperature range for S31803?",
+      "expectedPatterns": ["1870.*2010|1020.*1100", "°F|°C"],
+      "requiredCitations": ["A790"],
+      "category": "lookup",
+      "categoryLetter": "A",
+      "documents": ["A790"],
+      "difficulty": "easy",
+      "notes": "Heat treatment from Table 1"
+    },
+    {
+      "id": "A790-T4",
+      "query": "What is the maximum hardness for S32205 duplex pipe?",
+      "expectedPatterns": ["290\\s*HBW|30\\s*HRC", "S32205|2205"],
+      "requiredCitations": ["A790"],
+      "category": "lookup",
+      "categoryLetter": "A",
+      "documents": ["A790"],
+      "difficulty": "easy",
+      "notes": "Hardness limits from Table 2"
+    },
+    {
+      "id": "A790-T5",
+      "query": "What is the minimum elongation requirement for S32750?",
+      "expectedPatterns": ["15\\s*%|15\\s*percent", "elongation"],
+      "requiredCitations": ["A790"],
+      "category": "lookup",
+      "categoryLetter": "A",
+      "documents": ["A790"],
+      "difficulty": "easy",
+      "notes": "Elongation from Table 2"
+    },
+    {
+      "id": "A790-T6",
+      "query": "What ASTM standards are referenced by A790?",
+      "expectedPatterns": ["A370|A923|A999|A1016"],
+      "category": "list",
+      "categoryLetter": "B",
+      "documents": ["A790"],
+      "difficulty": "medium",
+      "notes": "Referenced Documents section"
+    },
+    {
+      "id": "A790-T7",
+      "query": "What quenching methods are permitted after solution annealing per A790?",
+      "expectedPatterns": ["water|liquid|air|spray|mist"],
+      "requiredCitations": ["A790"],
+      "category": "lookup",
+      "categoryLetter": "B",
+      "documents": ["A790"],
+      "difficulty": "medium",
+      "notes": "Heat Treatment section"
+    },
+    {
+      "id": "A790-T8",
+      "query": "What is the scope of ASTM A790? What products does it cover?",
+      "expectedPatterns": ["pipe", "seamless|welded", "ferritic.*austenitic|duplex"],
+      "requiredCitations": ["A790"],
+      "category": "lookup",
+      "categoryLetter": "B",
+      "documents": ["A790"],
+      "difficulty": "easy",
+      "notes": "Section 1 - Scope"
+    },
+    {
+      "id": "A790-T9",
+      "query": "What supplementary requirements are available in A790?",
+      "expectedPatterns": ["S1|S2|S3|S4", "supplementary"],
+      "requiredCitations": ["A790"],
+      "category": "list",
+      "categoryLetter": "B",
+      "documents": ["A790"],
+      "difficulty": "medium",
+      "notes": "Supplementary Requirements section"
+    },
+    {
+      "id": "A790-T10",
+      "query": "What NDE methods are specified for A790 pipe?",
+      "expectedPatterns": ["ultrasonic|eddy\\s*current|hydrostatic|UT|ET"],
+      "requiredCitations": ["A790"],
+      "category": "list",
+      "categoryLetter": "B",
+      "documents": ["A790"],
+      "difficulty": "medium",
+      "notes": "Testing Requirements section"
+    },
+    {
+      "id": "A790-T11",
+      "query": "Compare the tensile strength of S32205 vs S32750 per A790",
+      "expectedPatterns": ["S32205.*90|620", "S32750.*116|800", "ksi|MPa"],
+      "requiredCitations": ["A790"],
+      "category": "comparison",
+      "categoryLetter": "C",
+      "documents": ["A790"],
+      "difficulty": "medium",
+      "notes": "Tensile comparison from Table 2"
+    },
+    {
+      "id": "A790-T12",
+      "query": "What is the difference in nitrogen content between S32205 and S32750?",
+      "expectedPatterns": ["S32205.*0\\.14.*0\\.20|0\\.14-0\\.20", "S32750.*0\\.24.*0\\.32|0\\.24-0\\.32"],
+      "requiredCitations": ["A790"],
+      "category": "comparison",
+      "categoryLetter": "C",
+      "documents": ["A790"],
+      "difficulty": "medium",
+      "notes": "Nitrogen comparison from Table 1"
+    },
+    {
+      "id": "A790-T13",
+      "query": "Compare molybdenum content for S32205, S32750, and S32760",
+      "expectedPatterns": ["S32205.*2\\.5.*3\\.5|2\\.5-3\\.5", "S32750.*3\\.0.*5\\.0|3\\.0-5\\.0", "Mo|molybdenum"],
+      "requiredCitations": ["A790"],
+      "category": "comparison",
+      "categoryLetter": "C",
+      "documents": ["A790"],
+      "difficulty": "hard",
+      "notes": "Multi-grade Mo comparison"
+    },
+    {
+      "id": "A790-T14",
+      "query": "What are the complete mechanical and chemical requirements for S32205?",
+      "expectedPatterns": ["65\\s*ksi|450\\s*MPa", "90\\s*ksi|620\\s*MPa", "21\\.0.*23\\.0|Cr", "2\\.5.*3\\.5|Mo"],
+      "requiredCitations": ["A790"],
+      "category": "lookup",
+      "categoryLetter": "D",
+      "documents": ["A790"],
+      "difficulty": "hard",
+      "notes": "Multi-table synthesis (Tables 1 and 2)"
+    },
+    {
+      "id": "A790-T15",
+      "query": "What test specimens and procedures are required for A790 pipe?",
+      "expectedPatterns": ["tension|tensile|flattening|hardness|hydrostatic"],
+      "requiredCitations": ["A790"],
+      "category": "list",
+      "categoryLetter": "D",
+      "documents": ["A790"],
+      "difficulty": "hard",
+      "notes": "Testing requirements synthesis"
+    },
+    {
+      "id": "A790-T16",
+      "query": "What wall thickness tolerance applies to NPS 4 Schedule 40 A790 pipe?",
+      "expectedPatterns": ["tolerance|%|minimum|wall"],
+      "requiredCitations": ["A790"],
+      "category": "lookup",
+      "categoryLetter": "D",
+      "documents": ["A790"],
+      "difficulty": "hard",
+      "notes": "Dimensional requirements"
+    },
+    {
+      "id": "A790-T17",
+      "query": "What is the PREN formula for calculating pitting resistance of S32205?",
+      "expectedPatterns": ["cannot|not\\s+(?:in|included|provided)|no\\s+(?:information|formula)|don't\\s+have"],
+      "forbiddenPatterns": ["PREN\\s*=|Cr\\s*\\+\\s*3\\.3|%Cr\\s*\\+"],
+      "category": "refusal",
+      "categoryLetter": "E",
+      "documents": ["A790"],
+      "difficulty": "hard",
+      "notes": "PREN formula not in A790 - should refuse"
+    },
+    {
+      "id": "A790-T18",
+      "query": "What is the price per foot of A790 S32205 pipe?",
+      "expectedPatterns": ["cannot|not\\s+(?:in|included|provided)|no\\s+(?:information|pricing)|don't\\s+have"],
+      "forbiddenPatterns": ["\\$|USD|per\\s+foot|price"],
+      "category": "refusal",
+      "categoryLetter": "E",
+      "documents": ["A790"],
+      "difficulty": "easy",
+      "notes": "Pricing never in specs - should refuse"
+    },
+    {
+      "id": "A790-T19",
+      "query": "What is the corrosion rate of S32750 in seawater at 25C?",
+      "expectedPatterns": ["cannot|not\\s+(?:in|included|provided)|no\\s+(?:information|data)|don't\\s+have"],
+      "forbiddenPatterns": ["mm/year|mpy|corrosion\\s+rate\\s*[=:]"],
+      "category": "refusal",
+      "categoryLetter": "E",
+      "documents": ["A790"],
+      "difficulty": "medium",
+      "notes": "Corrosion rates not in A790 - should refuse"
+    },
+    {
+      "id": "A790-T20",
+      "query": "What welding procedures are required for A790 pipe repair?",
+      "expectedPatterns": ["Section\\s*15|repair.*welding|manufacturer|purchaser"],
+      "category": "lookup",
+      "categoryLetter": "D",
+      "documents": ["A790"],
+      "difficulty": "medium",
+      "notes": "A790 has Section 15 with limited welding info"
+    }
+  ]
+}

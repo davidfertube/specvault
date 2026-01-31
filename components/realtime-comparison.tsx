@@ -364,6 +364,19 @@ export function RealtimeComparison({
                         <SourceCitation key={source.ref} source={source} index={index} onOpenPdf={onOpenPdf} />
                       ))}
                     </div>
+
+                    {/* AI-assisted disclaimer */}
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.7 }}
+                      className="mt-3 p-2 bg-amber-50 border border-amber-200 rounded-md"
+                    >
+                      <p className="text-xs text-amber-700 flex items-center gap-1.5">
+                        <AlertTriangle className="h-3 w-3" />
+                        <span>AI-assisted — verify against source documents</span>
+                      </p>
+                    </motion.div>
                   </motion.div>
                 )}
               </>

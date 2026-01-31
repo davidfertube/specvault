@@ -74,7 +74,15 @@ CREATE TABLE IF NOT EXISTS chunks (
   document_id BIGINT REFERENCES documents(id) ON DELETE CASCADE,
   content TEXT NOT NULL,
   page_number INT,
-  embedding vector(3072), -- Google gemini-embedding-001 dimension
+  embedding vector(1024), -- Voyage AI voyage-3-lite dimension
+  -- Semantic chunking metadata
+  char_offset_start INT,
+  char_offset_end INT,
+  section_title TEXT,
+  chunk_type TEXT DEFAULT 'text' CHECK (chunk_type IN ('text', 'table', 'list', 'heading')),
+  has_codes BOOLEAN DEFAULT FALSE,
+  confidence FLOAT DEFAULT 0.75,
+  parent_section TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -91,8 +99,9 @@ CREATE POLICY "Allow anonymous chunk reads" ON chunks
   FOR SELECT TO anon USING (true);
 
 -- Function to search similar chunks
+-- Note: Uses 1024 dimensions for Voyage AI voyage-3-lite embeddings
 CREATE OR REPLACE FUNCTION search_chunks(
-  query_embedding vector(3072),
+  query_embedding vector(1024),
   match_threshold float DEFAULT 0.7,
   match_count int DEFAULT 5
 )
@@ -101,6 +110,8 @@ RETURNS TABLE (
   document_id bigint,
   content text,
   page_number int,
+  char_offset_start int,
+  char_offset_end int,
   similarity float
 )
 LANGUAGE plpgsql
@@ -112,9 +123,12 @@ BEGIN
     chunks.document_id,
     chunks.content,
     chunks.page_number,
+    chunks.char_offset_start,
+    chunks.char_offset_end,
     1 - (chunks.embedding <=> query_embedding) AS similarity
   FROM chunks
-  WHERE 1 - (chunks.embedding <=> query_embedding) > match_threshold
+  WHERE chunks.embedding IS NOT NULL
+    AND 1 - (chunks.embedding <=> query_embedding) > match_threshold
   ORDER BY chunks.embedding <=> query_embedding
   LIMIT match_count;
 END;

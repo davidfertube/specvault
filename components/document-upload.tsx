@@ -22,6 +22,7 @@ interface DocumentUploadProps {
 export function DocumentUpload({ onUploadComplete }: DocumentUploadProps) {
   const [file, setFile] = useState<UploadedFile | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<number>(0);
 
   // Notify parent when file completes upload
   useEffect(() => {
@@ -67,34 +68,96 @@ export function DocumentUpload({ onUploadComplete }: DocumentUploadProps) {
 
     // Replace any existing file
     setFile(uploadFile);
+    setUploadProgress(0);
 
     try {
-      // Upload to API
-      const formData = new FormData();
-      formData.append("file", newFile);
-
-      const response = await fetch("/api/documents/upload", {
+      // ========================================
+      // Step 1: Request Signed Upload URL
+      // ========================================
+      const urlResponse = await fetch("/api/documents/upload-url", {
         method: "POST",
-        body: formData,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          filename: newFile.name,
+          fileSize: newFile.size,
+          contentType: newFile.type,
+        }),
       });
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.details || errorData.error || "Upload failed");
+      if (!urlResponse.ok) {
+        const errorData = await urlResponse.json().catch(() => ({}));
+        throw new Error(errorData.details || errorData.error || "Failed to get upload URL");
       }
 
-      const uploadResult = await response.json();
+      const { documentId, uploadUrl, path } = await urlResponse.json();
+
+      // ========================================
+      // Step 2: Upload Directly to Supabase Storage
+      // ========================================
+      // Use XMLHttpRequest for progress tracking
+      await new Promise<void>((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+
+        // Track upload progress
+        xhr.upload.addEventListener("progress", (e) => {
+          if (e.lengthComputable) {
+            const percentComplete = Math.round((e.loaded / e.total) * 100);
+            setUploadProgress(percentComplete);
+          }
+        });
+
+        // Handle completion
+        xhr.addEventListener("load", () => {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            setUploadProgress(100);
+            resolve();
+          } else {
+            reject(new Error(`Upload failed with status ${xhr.status}`));
+          }
+        });
+
+        // Handle errors
+        xhr.addEventListener("error", () => {
+          reject(new Error("Network error during upload"));
+        });
+
+        xhr.addEventListener("abort", () => {
+          reject(new Error("Upload cancelled"));
+        });
+
+        // Start upload
+        xhr.open("PUT", uploadUrl);
+        xhr.setRequestHeader("Content-Type", "application/pdf");
+        xhr.setRequestHeader("x-upsert", "false");
+        xhr.send(newFile);
+      });
+
+      // ========================================
+      // Step 3: Confirm Upload Completion
+      // ========================================
+      const confirmResponse = await fetch("/api/documents/upload", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ documentId, path }),
+      });
+
+      if (!confirmResponse.ok) {
+        const errorData = await confirmResponse.json().catch(() => ({}));
+        throw new Error(errorData.details || errorData.error || "Upload confirmation failed");
+      }
 
       // Update status to processing
       setFile((prev) =>
         prev ? { ...prev, status: "processing" } : null
       );
 
-      // Call process endpoint to extract text and generate embeddings
+      // ========================================
+      // Step 4: Process Document (Extract Text & Generate Embeddings)
+      // ========================================
       const processResponse = await fetch("/api/documents/process", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ documentId: uploadResult.documentId }),
+        body: JSON.stringify({ documentId }),
       });
 
       if (!processResponse.ok) {
@@ -120,6 +183,7 @@ export function DocumentUpload({ onUploadComplete }: DocumentUploadProps) {
       setFile((prev) =>
         prev ? { ...prev, status: "error", error: errorMessage } : null
       );
+      setUploadProgress(0);
     }
   };
 
@@ -224,9 +288,19 @@ export function DocumentUpload({ onUploadComplete }: DocumentUploadProps) {
               </div>
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 w-full sm:w-auto">
                 {file.status === "uploading" && (
-                  <div className="flex items-center gap-2">
-                    <Loader2 className="w-5 h-5 animate-spin text-black/60" />
-                    <span className="text-sm sm:text-base text-black/60">Uploading...</span>
+                  <div className="flex flex-col gap-2 w-full sm:w-auto sm:min-w-[200px]">
+                    <div className="flex items-center gap-2">
+                      <Loader2 className="w-5 h-5 animate-spin text-blue-600" />
+                      <span className="text-sm sm:text-base font-medium text-blue-600">
+                        Uploading... {uploadProgress}%
+                      </span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                      <div
+                        className="bg-blue-600 h-2 rounded-full transition-all duration-300 ease-out"
+                        style={{ width: `${uploadProgress}%` }}
+                      />
+                    </div>
                   </div>
                 )}
                 {file.status === "processing" && (

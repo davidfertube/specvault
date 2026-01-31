@@ -36,7 +36,7 @@ describe('SearchForm', () => {
     );
 
     expect(screen.getByPlaceholderText(/ask about steel specs/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /run analysis/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /run comparison/i })).toBeInTheDocument();
   });
 
   it('should disable button when input is empty', () => {
@@ -48,7 +48,7 @@ describe('SearchForm', () => {
       />
     );
 
-    const button = screen.getByRole('button', { name: /run analysis/i });
+    const button = screen.getByRole('button', { name: /run comparison/i });
     expect(button).toBeDisabled();
   });
 
@@ -64,7 +64,7 @@ describe('SearchForm', () => {
     const input = screen.getByPlaceholderText(/ask about steel specs/i);
     await userEvent.type(input, 'What is A106 Grade B?');
 
-    const button = screen.getByRole('button', { name: /run analysis/i });
+    const button = screen.getByRole('button', { name: /run comparison/i });
     expect(button).not.toBeDisabled();
   });
 
@@ -86,7 +86,7 @@ describe('SearchForm', () => {
     const input = screen.getByPlaceholderText(/ask about steel specs/i);
     await userEvent.type(input, 'What is A106 Grade B?');
 
-    const button = screen.getByRole('button', { name: /run analysis/i });
+    const button = screen.getByRole('button', { name: /run comparison/i });
     fireEvent.click(button);
 
     await waitFor(() => {
@@ -110,7 +110,7 @@ describe('SearchForm', () => {
     const input = screen.getByPlaceholderText(/ask about steel specs/i);
     await userEvent.type(input, 'test query');
 
-    const button = screen.getByRole('button', { name: /run analysis/i });
+    const button = screen.getByRole('button', { name: /run comparison/i });
     fireEvent.click(button);
 
     await waitFor(() => {
@@ -134,7 +134,7 @@ describe('SearchForm', () => {
     const input = screen.getByPlaceholderText(/ask about steel specs/i);
     await userEvent.type(input, 'test query');
 
-    const button = screen.getByRole('button', { name: /run analysis/i });
+    const button = screen.getByRole('button', { name: /run comparison/i });
     fireEvent.click(button);
 
     await waitFor(() => {
@@ -144,36 +144,5 @@ describe('SearchForm', () => {
     await waitFor(() => {
       expect(mockOnLoadingChange).toHaveBeenCalledWith(false);
     });
-  });
-
-  it('should render example query chips', () => {
-    render(
-      <SearchForm
-        onResult={mockOnResult}
-        onError={mockOnError}
-        onLoadingChange={mockOnLoadingChange}
-      />
-    );
-
-    expect(screen.getByText(/minimum tensile strength/i)).toBeInTheDocument();
-    expect(screen.getByText(/chemical composition/i)).toBeInTheDocument();
-    expect(screen.getByText(/hardness limits/i)).toBeInTheDocument();
-    expect(screen.getByText(/corrosion resistance/i)).toBeInTheDocument();
-  });
-
-  it('should fill input when clicking example query', async () => {
-    render(
-      <SearchForm
-        onResult={mockOnResult}
-        onError={mockOnError}
-        onLoadingChange={mockOnLoadingChange}
-      />
-    );
-
-    const exampleButton = screen.getByText(/minimum tensile strength/i);
-    fireEvent.click(exampleButton);
-
-    const input = screen.getByPlaceholderText(/ask about steel specs/i) as HTMLInputElement;
-    expect(input.value).toBe('What is the minimum tensile strength?');
   });
 });

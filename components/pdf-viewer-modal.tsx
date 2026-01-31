@@ -13,13 +13,12 @@ interface PDFViewerModalProps {
 }
 
 export function PDFViewerModal({ source, isOpen, onClose }: PDFViewerModalProps) {
-  const initialPage = source?.page ? parseInt(source.page) || 1 : 1;
-
-  const [currentPage, setCurrentPage] = useState<number>(initialPage);
+  const [currentPage, setCurrentPage] = useState<number>(1);
   const [loading, setLoading] = useState<boolean>(true);
 
   // Build the PDF URL - prioritize signed URL for better browser compatibility
-  const getPdfUrl = useCallback(() => {
+  // Using useMemo instead of useCallback since we're computing a value
+  const pdfUrl = (() => {
     // Prefer the direct signed URL from Supabase (better browser PDF rendering)
     if (source?.document_url) {
       // Remove any existing page anchor
@@ -30,17 +29,24 @@ export function PDFViewerModal({ source, isOpen, onClose }: PDFViewerModalProps)
       return `/api/documents/pdf?path=${encodeURIComponent(source.storage_path)}`;
     }
     return null;
-  }, [source?.storage_path, source?.document_url]);
+  })();
 
-  const pdfUrl = getPdfUrl();
+  // Track source ref to detect changes
+  const sourceRef = source?.ref;
+  const sourcePage = source?.page;
 
-  // Reset state when source changes
+  // Reset state when source changes - use separate state tracking
   useEffect(() => {
-    if (source) {
-      setCurrentPage(parseInt(source.page) || 1);
-      setLoading(true);
+    if (sourceRef && sourcePage) {
+      const pageNum = parseInt(sourcePage) || 1;
+      // Use timeout to avoid synchronous setState in effect
+      const timer = setTimeout(() => {
+        setCurrentPage(pageNum);
+        setLoading(true);
+      }, 0);
+      return () => clearTimeout(timer);
     }
-  }, [source?.ref]);
+  }, [sourceRef, sourcePage]);
 
   // Handle keyboard navigation
   useEffect(() => {
@@ -197,7 +203,7 @@ export function PDFViewerModal({ source, isOpen, onClose }: PDFViewerModalProps)
             )}
 
             {/* Citation Location Indicator */}
-            {currentPage === initialPage && source.char_offset_start !== undefined && !loading && (
+            {currentPage === (parseInt(source.page) || 1) && source.char_offset_start !== undefined && !loading && (
               <CitationIndicator
                 charOffsetStart={source.char_offset_start}
                 charOffsetEnd={source.char_offset_end}
@@ -211,7 +217,7 @@ export function PDFViewerModal({ source, isOpen, onClose }: PDFViewerModalProps)
               <div className="w-1 h-full min-h-[40px] bg-red-500 rounded-full shrink-0" />
               <div className="flex-1 min-w-0">
                 <p className="text-xs font-medium text-muted-foreground mb-1">
-                  Look for this text on page {initialPage}:
+                  Look for this text on page {(parseInt(source.page) || 1)}:
                 </p>
                 <p className="text-sm text-foreground leading-relaxed line-clamp-3 font-medium">
                   &quot;{source.content_preview}&quot;

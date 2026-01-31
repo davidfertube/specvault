@@ -1,59 +1,167 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
-import { validatePdfMagicBytes, MAX_PDF_SIZE } from "@/lib/validation";
+import { MAX_PDF_SIZE } from "@/lib/validation";
 import { handleApiError, createValidationError, getErrorStatusCode } from "@/lib/errors";
 
 /**
- * Document Upload API Route
+ * Document Upload Confirmation API Route
  *
- * This endpoint handles PDF uploads with comprehensive validation:
- * 1. File presence check
- * 2. MIME type validation
- * 3. File size validation
- * 4. PDF magic byte validation (security - prevents file type spoofing)
- * 5. Uploads to Supabase Storage
- * 6. Creates database record for tracking
+ * This endpoint confirms that a client-side upload to Supabase Storage
+ * was completed successfully. It validates the uploaded file and updates
+ * the database record from 'uploading' to 'pending' status.
+ *
+ * This approach bypasses Vercel's 4.5MB serverless function body size limit
+ * by having clients upload directly to Supabase Storage using signed URLs.
+ *
+ * Flow:
+ * 1. Client requests signed URL from /api/documents/upload-url
+ * 2. Client uploads file directly to Supabase using signed URL
+ * 3. Client calls THIS endpoint to confirm upload completion
+ * 4. Server validates file exists and is a valid PDF
+ * 5. Server updates database status to 'pending'
  *
  * Security features:
+ * - Verifies file exists in storage before confirming
  * - PDF magic byte validation (prevents non-PDFs disguised as PDFs)
- * - File size limits (50MB)
- * - Filename sanitization (prevents path traversal)
+ * - Validates document record status is 'uploading'
+ * - Updates file size from actual storage (not client-reported)
  * - Safe error handling (no internal details leaked)
  */
+
+interface UploadConfirmRequest {
+  documentId: number;  // Supabase BIGSERIAL returns number
+  path: string;
+}
 
 export async function POST(request: NextRequest) {
   try {
     // ========================================
-    // Step 1: Extract File from FormData
+    // Step 1: Parse and Validate Request Body
     // ========================================
-    const formData = await request.formData();
-    const file = formData.get("file") as File;
+    let body: UploadConfirmRequest;
 
-    if (!file) {
-      const error = createValidationError("No file provided. Please select a PDF to upload.");
+    try {
+      body = await request.json();
+    } catch {
+      const error = createValidationError("Invalid request body. Expected JSON.");
+      return NextResponse.json(error, { status: getErrorStatusCode("VALIDATION_ERROR") });
+    }
+
+    const { documentId, path } = body;
+
+    if (!documentId || typeof documentId !== "number") {
+      const error = createValidationError("Missing or invalid documentId.");
+      return NextResponse.json(error, { status: getErrorStatusCode("VALIDATION_ERROR") });
+    }
+
+    if (!path || typeof path !== "string") {
+      const error = createValidationError("Missing or invalid path.");
       return NextResponse.json(error, { status: getErrorStatusCode("VALIDATION_ERROR") });
     }
 
     // ========================================
-    // Step 2: Basic MIME Type Check
+    // Step 2: Verify Database Record Exists
     // ========================================
-    // This is a quick check but NOT security - MIME type is client-controlled
-    if (file.type !== "application/pdf") {
-      const error = createValidationError("Only PDF files are allowed. Please upload a .pdf file.");
+    const { data: docData, error: docError } = await supabase
+      .from("documents")
+      .select("id, status, filename, storage_path")
+      .eq("id", documentId)
+      .single();
+
+    if (docError || !docData) {
+      console.error("[Upload Confirm API] Document not found:", docError);
+      const error = createValidationError("Document record not found.");
+      return NextResponse.json(error, { status: 404 });
+    }
+
+    // Verify document is in 'uploading' status
+    if (docData.status !== "uploading") {
+      const error = createValidationError(
+        `Document status is '${docData.status}', expected 'uploading'.`
+      );
       return NextResponse.json(error, { status: getErrorStatusCode("VALIDATION_ERROR") });
     }
 
     // ========================================
-    // Step 3: File Size Validation
+    // Step 3: Verify File Exists in Storage
     // ========================================
-    if (file.size === 0) {
-      const error = createValidationError("File is empty. Please upload a valid PDF document.");
+    const { data: fileList, error: listError } = await supabase.storage
+      .from("documents")
+      .list("", {
+        search: path,
+      });
+
+    if (listError || !fileList || fileList.length === 0) {
+      console.error("[Upload Confirm API] File not found in storage:", listError);
+
+      // Clean up orphaned database record
+      try {
+        await supabase.from("documents").delete().eq("id", documentId);
+      } catch (cleanupError) {
+        console.error("[Upload Confirm API] Failed to clean up orphaned record:", cleanupError);
+      }
+
+      const error = createValidationError("File not found in storage. Upload may have failed.");
+      return NextResponse.json(error, { status: 404 });
+    }
+
+    // Get actual file size from storage
+    const actualFileSize = fileList[0].metadata?.size || 0;
+
+    // ========================================
+    // Step 4: Download File for PDF Validation
+    // ========================================
+    // This is a security check - verify the file is actually a PDF
+    const { data: fileData, error: downloadError } = await supabase.storage
+      .from("documents")
+      .download(path);
+
+    if (downloadError || !fileData) {
+      console.error("[Upload Confirm API] Failed to download file for validation:", downloadError);
+      const error = createValidationError("Failed to validate uploaded file.");
       return NextResponse.json(error, { status: getErrorStatusCode("VALIDATION_ERROR") });
     }
 
-    if (file.size > MAX_PDF_SIZE) {
-      const sizeMB = (file.size / (1024 * 1024)).toFixed(1);
+    // Read first 5 bytes to check PDF magic bytes
+    const buffer = await fileData.slice(0, 5).arrayBuffer();
+    const bytes = new Uint8Array(buffer);
+
+    // PDF magic bytes: %PDF- (0x25 0x50 0x44 0x46 0x2D)
+    const PDF_MAGIC = [0x25, 0x50, 0x44, 0x46, 0x2D];
+    const isPdf = PDF_MAGIC.every((byte, index) => bytes[index] === byte);
+
+    if (!isPdf) {
+      console.error("[Upload Confirm API] Invalid PDF magic bytes");
+
+      // Clean up invalid file
+      try {
+        await supabase.storage.from("documents").remove([path]);
+        await supabase.from("documents").delete().eq("id", documentId);
+      } catch (cleanupError) {
+        console.error("[Upload Confirm API] Failed to clean up invalid file:", cleanupError);
+      }
+
+      const error = createValidationError(
+        "Invalid PDF file. The uploaded file does not appear to be a valid PDF document."
+      );
+      return NextResponse.json(error, { status: getErrorStatusCode("VALIDATION_ERROR") });
+    }
+
+    // ========================================
+    // Step 5: Validate File Size
+    // ========================================
+    if (actualFileSize > MAX_PDF_SIZE) {
+      const sizeMB = (actualFileSize / (1024 * 1024)).toFixed(1);
       const maxMB = (MAX_PDF_SIZE / (1024 * 1024)).toFixed(0);
+
+      // Clean up file that exceeds size limit
+      try {
+        await supabase.storage.from("documents").remove([path]);
+        await supabase.from("documents").delete().eq("id", documentId);
+      } catch (cleanupError) {
+        console.error("[Upload Confirm API] Failed to clean up oversized file:", cleanupError);
+      }
+
       const error = createValidationError(
         `File too large (${sizeMB}MB). Maximum allowed size is ${maxMB}MB.`
       );
@@ -61,86 +169,36 @@ export async function POST(request: NextRequest) {
     }
 
     // ========================================
-    // Step 4: PDF Magic Byte Validation (Security)
-    // ========================================
-    // This checks the actual file content, not just the MIME type
-    // Prevents attackers from uploading malicious files with a fake .pdf extension
-    const pdfValidation = await validatePdfMagicBytes(file);
-    if (!pdfValidation.isValid) {
-      const error = createValidationError(pdfValidation.error || "Invalid PDF file.");
-      return NextResponse.json(error, { status: getErrorStatusCode("VALIDATION_ERROR") });
-    }
-
-    // ========================================
-    // Step 5: Generate Safe Filename
-    // ========================================
-    // Use timestamp + sanitized filename to prevent collisions and path traversal
-    const timestamp = Date.now();
-    // Sanitize filename: keep only alphanumeric, dots, and hyphens
-    const sanitizedName = file.name.replace(/[^a-zA-Z0-9.-]/g, "_");
-    const fileName = `${timestamp}-${sanitizedName}`;
-
-    // ========================================
-    // Step 6: Upload to Supabase Storage
-    // ========================================
-    // Convert File to ArrayBuffer for upload
-    const arrayBuffer = await file.arrayBuffer();
-    const buffer = new Uint8Array(arrayBuffer);
-
-    const { data, error: uploadError } = await supabase.storage
-      .from("documents")
-      .upload(fileName, buffer, {
-        contentType: "application/pdf",
-        upsert: false, // Don't overwrite existing files
-      });
-
-    if (uploadError) {
-      console.error("[Upload API] Supabase storage error:", uploadError);
-      // Use safe error response - don't leak storage details
-      const { response, status } = handleApiError(uploadError, "Document Upload - Storage");
-      return NextResponse.json(response, { status });
-    }
-
-    // ========================================
-    // Step 7: Get Public URL
+    // Step 6: Get Public URL
     // ========================================
     const { data: urlData } = supabase.storage
       .from("documents")
-      .getPublicUrl(fileName);
+      .getPublicUrl(path);
 
     // ========================================
-    // Step 8: Create Database Record
+    // Step 7: Update Database Status
     // ========================================
-    const { data: docData, error: docError } = await supabase
+    const { error: updateError } = await supabase
       .from("documents")
-      .insert({
-        filename: file.name, // Store original filename for display
-        storage_path: data.path,
-        file_size: file.size,
+      .update({
         status: "pending", // Will be updated to "indexed" after processing
+        file_size: actualFileSize, // Use actual size from storage
       })
-      .select("id")
-      .single();
+      .eq("id", documentId);
 
-    if (docError) {
-      console.error("[Upload API] Database insert error:", docError);
-      // Try to clean up the uploaded file since we couldn't create the record
-      try {
-        await supabase.storage.from("documents").remove([fileName]);
-      } catch (cleanupError) {
-        console.error("[Upload API] Failed to clean up orphaned file:", cleanupError);
-      }
-      const { response, status } = handleApiError(docError, "Document Upload - Database");
+    if (updateError) {
+      console.error("[Upload Confirm API] Failed to update document status:", updateError);
+      const { response, status } = handleApiError(updateError, "Upload Confirmation - Database Update");
       return NextResponse.json(response, { status });
     }
 
     // ========================================
-    // Step 9: Return Success Response
+    // Step 8: Return Success Response
     // ========================================
     return NextResponse.json({
       success: true,
-      documentId: docData.id,
-      path: data.path,
+      documentId: documentId,
+      path: path,
       url: urlData.publicUrl,
     });
 

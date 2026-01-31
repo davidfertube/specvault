@@ -13,6 +13,8 @@
  */
 
 import { VoyageAIClient } from "voyageai";
+import { sleep } from "@/lib/utils/sleep";
+import { isRateLimitError } from "@/lib/utils/error-detection";
 
 // Lazy-initialized Voyage AI client
 // IMPORTANT: Must use lazy init to ensure env var is read at request time, not module load time
@@ -49,29 +51,6 @@ const EMBEDDING_MODEL = "voyage-3-lite";
 // Retry configuration
 const MAX_RETRIES = 3;
 const BASE_RETRY_DELAY = 1000;
-
-/**
- * Sleep for a specified duration
- */
-function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-/**
- * Check if error is a rate limit error
- */
-function isRateLimitError(error: unknown): boolean {
-  if (error instanceof Error) {
-    const msg = error.message.toLowerCase();
-    return (
-      msg.includes("rate limit") ||
-      msg.includes("quota") ||
-      msg.includes("429") ||
-      msg.includes("too many")
-    );
-  }
-  return false;
-}
 
 /**
  * Generate embedding for a single text
@@ -181,15 +160,4 @@ export async function generateEmbeddings(texts: string[]): Promise<number[][]> {
 
   console.log(`[Embeddings] Completed batch embedding of ${total} chunks`);
   return embeddings;
-}
-
-/**
- * Generate embeddings in parallel (same as batch for Voyage AI)
- * Kept for API compatibility
- */
-export async function generateEmbeddingsParallel(
-  texts: string[],
-  _batchSize?: number
-): Promise<number[][]> {
-  return generateEmbeddings(texts);
 }

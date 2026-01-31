@@ -14,6 +14,8 @@
  */
 
 import Groq from "groq-sdk";
+import { sleep } from "@/lib/utils/sleep";
+import { isRateLimitError } from "@/lib/utils/error-detection";
 
 // ============================================
 // Provider Configuration
@@ -28,11 +30,19 @@ interface ProviderConfig {
 }
 
 const PROVIDERS: ProviderConfig[] = [
+  // Anthropic Opus 4.5 - Primary provider (user has credits)
+  {
+    name: "Anthropic",
+    baseUrl: "https://api.anthropic.com/v1",
+    envKey: "ANTHROPIC_API_KEY",
+    models: ["claude-3-5-sonnet-20241022", "claude-3-haiku-20240307", "claude-3-sonnet-20240229"],
+  },
+  // Fallback providers (free tiers)
   {
     name: "Groq",
     baseUrl: "https://api.groq.com/openai/v1",
     envKey: "GROQ_API_KEY",
-    models: ["llama-3.3-70b-versatile", "llama-3.1-8b-instant", "mixtral-8x7b-32768"],
+    models: ["llama-3.3-70b-versatile", "llama-3.1-8b-instant"],
   },
   {
     name: "Cerebras",
@@ -41,16 +51,10 @@ const PROVIDERS: ProviderConfig[] = [
     models: ["llama-3.3-70b", "llama-3.1-8b"],
   },
   {
-    name: "Together",
-    baseUrl: "https://api.together.xyz/v1",
-    envKey: "TOGETHER_API_KEY",
-    models: ["meta-llama/Llama-3.3-70B-Instruct-Turbo", "meta-llama/Llama-3.1-8B-Instruct-Turbo"],
-  },
-  {
     name: "OpenRouter",
     baseUrl: "https://openrouter.ai/api/v1",
     envKey: "OPENROUTER_API_KEY",
-    models: ["meta-llama/llama-3.3-70b-instruct:free", "mistralai/mistral-7b-instruct:free"],
+    models: ["meta-llama/llama-3.3-70b-instruct:free"],
     headers: { "HTTP-Referer": "https://steel-agents.com" },
   },
 ];
@@ -59,7 +63,7 @@ const PROVIDERS: ProviderConfig[] = [
 export const TEXT_MODELS = [
   "llama-3.3-70b-versatile",
   "llama-3.1-8b-instant",
-  "mixtral-8x7b-32768",
+  "gemma2-9b-it",
 ] as const;
 
 export const EMBEDDING_MODELS = ["voyage-3-lite"] as const;
@@ -71,15 +75,8 @@ export type EmbeddingModel = typeof EMBEDDING_MODELS[number];
 // Error Detection
 // ============================================
 
-export function isRateLimitError(error: unknown): boolean {
-  if (error instanceof Error) {
-    const msg = error.message.toLowerCase();
-    return msg.includes("rate limit") || msg.includes("quota") ||
-           msg.includes("429") || msg.includes("too many") ||
-           msg.includes("resource exhausted");
-  }
-  return false;
-}
+// Re-export for backward compatibility
+export { isRateLimitError } from "@/lib/utils/error-detection";
 
 export function isModelNotFoundError(error: unknown): boolean {
   if (error instanceof Error) {
@@ -206,6 +203,29 @@ export class ModelFallbackClient {
               max_tokens: 2048,
             });
             text = completion.choices[0]?.message?.content || "";
+          } else if (provider.name === "Anthropic") {
+            // Use Anthropic's native API format
+            const response = await fetch(`${provider.baseUrl}/messages`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "x-api-key": apiKey,
+                "anthropic-version": "2023-06-01",
+              },
+              body: JSON.stringify({
+                model,
+                max_tokens: 2048,
+                temperature: 0.3,
+                messages: [{ role: "user", content: prompt }],
+              }),
+            });
+
+            if (!response.ok) {
+              throw new Error(`${response.status}: ${await response.text()}`);
+            }
+
+            const data = await response.json() as { content: Array<{ text: string }> };
+            text = data.content[0]?.text || "";
           } else {
             // Use OpenAI-compatible API for others
             text = await callOpenAICompatible(
@@ -221,7 +241,10 @@ export class ModelFallbackClient {
             console.log(`[ModelFallback] Success with ${provider.name}/${model}`);
           }
 
-          return { text, modelUsed: `${provider.name}/${model}` };
+          // Strip <think>...</think> tags from qwen/reasoning models
+          const cleanText = text.replace(/<think>[\s\S]*?<\/think>/gi, "").trim();
+
+          return { text: cleanText, modelUsed: `${provider.name}/${model}` };
         } catch (error) {
           lastError = error instanceof Error ? error : new Error(String(error));
 
@@ -256,10 +279,6 @@ export class ModelFallbackClient {
 // ============================================
 // Embedding Rate Limiter
 // ============================================
-
-function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
 
 export class EmbeddingRateLimiter {
   private lastRequestTime: number = 0;

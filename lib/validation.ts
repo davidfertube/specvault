@@ -65,13 +65,67 @@ const MAX_QUERY_LENGTH = 2000; // ~500 words
 const MIN_QUERY_LENGTH = 3;    // Prevent empty/meaningless queries
 
 /**
+ * Prompt injection patterns to detect and block
+ * These are common patterns used to try to override system instructions
+ */
+const PROMPT_INJECTION_PATTERNS = [
+  // Common LLM control tokens
+  /\[SYSTEM\]/i,
+  /\[INST\]/i,
+  /\[\/INST\]/i,
+  /<\|im_start\|>/i,
+  /<\|im_end\|>/i,
+  /<\|system\|>/i,
+  /<\|user\|>/i,
+  /<\|assistant\|>/i,
+  /<\/s>/i,
+  /<<SYS>>/i,
+  /<\/SYS>>/i,
+
+  // Override instructions
+  /ignore\s+(?:previous|above|all)\s+(?:instructions?|rules?|prompts?)/i,
+  /disregard\s+(?:previous|above|all)\s+(?:instructions?|rules?|prompts?)/i,
+  /forget\s+(?:previous|above|all)\s+(?:instructions?|rules?|prompts?)/i,
+  /new\s+instructions?:/i,
+  /override\s+(?:system|instructions?|rules?)/i,
+
+  // Role manipulation
+  /you\s+are\s+now\s+(?:a|an|the)/i,
+  /pretend\s+(?:to\s+be|you\s+are)/i,
+  /act\s+as\s+(?:a|an|if)/i,
+  /roleplay\s+as/i,
+
+  // Jailbreak attempts
+  /jailbreak/i,
+  /DAN\s+mode/i,
+  /developer\s+mode/i,
+  /bypass\s+(?:filter|safety|restriction)/i,
+];
+
+/**
+ * Check if query contains prompt injection attempts
+ */
+function detectPromptInjection(query: string): { detected: boolean; pattern?: string } {
+  for (const pattern of PROMPT_INJECTION_PATTERNS) {
+    if (pattern.test(query)) {
+      return {
+        detected: true,
+        pattern: pattern.source,
+      };
+    }
+  }
+  return { detected: false };
+}
+
+/**
  * Validate and sanitize a user query
  *
  * This function:
  * 1. Type checks the input (must be string)
  * 2. Validates length (min 3, max 2000 characters)
- * 3. Sanitizes by removing control characters
- * 4. Normalizes whitespace
+ * 3. Detects and blocks prompt injection attempts
+ * 4. Sanitizes by removing control characters
+ * 5. Normalizes whitespace
  *
  * @param query - The user query to validate
  * @returns Object with validation result, cleaned query, and optional error
@@ -104,6 +158,16 @@ export function validateQuery(query: unknown): {
     return {
       isValid: false,
       error: `Query too long. Maximum ${MAX_QUERY_LENGTH} characters allowed.`,
+    };
+  }
+
+  // Prompt injection detection
+  const injectionCheck = detectPromptInjection(trimmed);
+  if (injectionCheck.detected) {
+    console.warn(`[Validation] Prompt injection attempt detected: ${injectionCheck.pattern}`);
+    return {
+      isValid: false,
+      error: 'Your query contains invalid patterns. Please rephrase your question.',
     };
   }
 

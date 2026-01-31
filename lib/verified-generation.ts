@@ -12,6 +12,7 @@
 
 import { searchWithFallback, type HybridSearchResult } from "./hybrid-search";
 import { preprocessQuery, formatExtractedCodes } from "./query-preprocessing";
+import { resolveSpecsToDocuments } from "./document-mapper";
 import {
   STRUCTURED_SYSTEM_PROMPT,
   buildStructuredUserPrompt,
@@ -103,15 +104,24 @@ export async function generateVerifiedResponse(
   // Get knowledge graph insights if applicable
   const knowledgeInsights: string[] = [];
   if (enable_knowledge_graph && processedQuery.extractedCodes.uns) {
-    const insights = getKnowledgeInsights(processedQuery.extractedCodes.uns);
-    knowledgeInsights.push(...insights);
+    // Handle array of UNS codes (extractedCodes.uns is now string[])
+    for (const uns of processedQuery.extractedCodes.uns) {
+      const insights = getKnowledgeInsights(uns);
+      knowledgeInsights.push(...insights);
+    }
   }
 
-  // Step 2: Hybrid search
+  // Step 2: Resolve document filter from ASTM codes
+  const documentFilter = await resolveSpecsToDocuments(processedQuery.extractedCodes);
+  if (documentFilter) {
+    console.log(`[Verified Generation] Document filter: [${documentFilter.join(", ")}]`);
+  }
+
+  // Step 3: Hybrid search with document filter
   let chunks: HybridSearchResult[] = [];
   try {
     chunks = await withTimeout(
-      searchWithFallback(query, 5),
+      searchWithFallback(query, 5, documentFilter),
       TIMEOUTS.VECTOR_SEARCH,
       "Hybrid search"
     );

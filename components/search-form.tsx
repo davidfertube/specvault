@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, Loader2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { queryKnowledgeBase, queryWithComparison, ApiRequestError, Source, GenericLLMResponse } from "@/lib/api";
-import { useSafeTimeout } from "@/hooks/use-safe-state";
 
 interface SearchFormProps {
   onResult: (response: string, sources: Source[]) => void;
@@ -17,11 +16,6 @@ interface SearchFormProps {
   ) => void;
 }
 
-// Example queries - generic enough to work with any steel spec document
-const EXAMPLE_QUERIES = [
-  "What is the minimum tensile strength?",
-  "List the chemical composition requirements",
-];
 
 export function SearchForm({
   onResult,
@@ -31,11 +25,7 @@ export function SearchForm({
 }: SearchFormProps) {
   const [query, setQuery] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [isAnimating, setIsAnimating] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-
-  // Use safe timeout to prevent memory leaks on unmount
-  const { setSafeTimeout } = useSafeTimeout();
 
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
@@ -72,25 +62,12 @@ export function SearchForm({
     [query, isLoading, onResult, onError, onLoadingChange, onComparisonResult]
   );
 
-  // Handle example query click with animation
-  // Uses safe timeout to prevent memory leaks if component unmounts
-  const handleExampleClick = useCallback((exampleQuery: string) => {
-    setIsAnimating(true);
-    setQuery(exampleQuery);
-    inputRef.current?.focus();
-    // Safe timeout auto-clears on unmount
-    setSafeTimeout(() => setIsAnimating(false), 600);
-  }, [setSafeTimeout]);
 
   return (
     <div className="w-full space-y-6">
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Search Input - Clean minimal style */}
-        <motion.div
-          className="relative"
-          animate={isAnimating ? { scale: [1, 1.01, 1] } : {}}
-          transition={{ duration: 0.3 }}
-        >
+        <div className="relative">
           <input
             ref={inputRef}
             type="text"
@@ -121,7 +98,7 @@ export function SearchForm({
               </motion.button>
             )}
           </AnimatePresence>
-        </motion.div>
+        </div>
 
         {/* Submit Button */}
         <div className="flex items-center justify-end gap-3">
@@ -145,32 +122,6 @@ export function SearchForm({
         </div>
       </form>
 
-      {/* Quick Prompts - Click to populate input */}
-      <div className="space-y-3">
-        <p className="label-section">Quick prompts - click to try</p>
-        <div className="flex flex-wrap gap-2">
-          {EXAMPLE_QUERIES.map((example, index) => (
-            <motion.button
-              key={index}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              whileTap={{ scale: 0.95 }}
-              transition={{ duration: 0.3, delay: index * 0.05 }}
-              type="button"
-              onClick={() => handleExampleClick(example)}
-              disabled={isLoading}
-              className={`px-3 py-1.5 text-xs sm:text-sm rounded-md transition-all duration-200
-                ${query === example
-                  ? 'bg-black text-white border border-black'
-                  : 'text-black/60 border border-black/20 hover:border-black hover:text-black'
-                }
-                disabled:cursor-not-allowed disabled:opacity-50`}
-            >
-              {example}
-            </motion.button>
-          ))}
-        </div>
-      </div>
     </div>
   );
 }

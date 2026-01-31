@@ -1,45 +1,20 @@
--- Migration: Add Hybrid Search (BM25 + Vector)
--- Purpose: Enable exact code matching for UNS numbers, ASTM standards, etc.
--- This combines full-text search (BM25) with vector similarity for better accuracy.
+-- Migration: Add Document Filtering to Hybrid Search
+-- Purpose: Enable filtering search to specific documents based on spec codes
+--
+-- This solves the A789/A790 confusion problem:
+-- - A789 (tubing): S32205 yield = 70 ksi
+-- - A790 (pipe): S32205 yield = 65 ksi
+-- When user asks "per A790", we now filter to only A790 documents.
 
 -- ============================================================================
--- Step 1: Add tsvector column for efficient full-text search
+-- Step 1: Drop existing functions (required to change signature)
 -- ============================================================================
 
-ALTER TABLE chunks ADD COLUMN IF NOT EXISTS search_vector tsvector;
+DROP FUNCTION IF EXISTS hybrid_search_chunks(text, vector(1024), int, float, float);
+DROP FUNCTION IF EXISTS bm25_search_chunks(text, int);
 
 -- ============================================================================
--- Step 2: Populate search_vector from existing content
--- ============================================================================
-
-UPDATE chunks SET search_vector = to_tsvector('english', content)
-WHERE search_vector IS NULL;
-
--- ============================================================================
--- Step 3: Create GIN index for fast full-text search
--- ============================================================================
-
-CREATE INDEX IF NOT EXISTS chunks_search_idx ON chunks USING GIN (search_vector);
-
--- ============================================================================
--- Step 4: Create trigger to auto-update search_vector on insert/update
--- ============================================================================
-
-CREATE OR REPLACE FUNCTION chunks_search_vector_trigger() RETURNS trigger AS $$
-BEGIN
-  NEW.search_vector := to_tsvector('english', NEW.content);
-  RETURN NEW;
-END
-$$ LANGUAGE plpgsql;
-
-DROP TRIGGER IF EXISTS chunks_search_update ON chunks;
-CREATE TRIGGER chunks_search_update
-  BEFORE INSERT OR UPDATE OF content ON chunks
-  FOR EACH ROW EXECUTE FUNCTION chunks_search_vector_trigger();
-
--- ============================================================================
--- Step 5: Create hybrid search function
--- Combines BM25-style full-text search with vector similarity
+-- Step 2: Recreate hybrid_search_chunks with document filter parameter
 -- ============================================================================
 
 CREATE OR REPLACE FUNCTION hybrid_search_chunks(
@@ -47,13 +22,16 @@ CREATE OR REPLACE FUNCTION hybrid_search_chunks(
   query_embedding vector(1024),
   match_count int DEFAULT 10,
   bm25_weight float DEFAULT 0.3,
-  vector_weight float DEFAULT 0.7
+  vector_weight float DEFAULT 0.7,
+  filter_document_ids bigint[] DEFAULT NULL  -- NEW: Optional document filter
 )
 RETURNS TABLE (
   id bigint,
   document_id bigint,
   content text,
   page_number int,
+  char_offset_start int,
+  char_offset_end int,
   bm25_score float,
   vector_score float,
   combined_score float
@@ -65,27 +43,35 @@ BEGIN
   WITH
   -- BM25-style full-text search using PostgreSQL's ts_rank_cd
   -- ts_rank_cd uses cover density ranking which works well for technical content
+  -- ADDED: filter_document_ids filter in WHERE clause
   bm25_results AS (
     SELECT
       c.id,
       c.document_id,
       c.content,
       c.page_number,
+      c.char_offset_start,
+      c.char_offset_end,
       ts_rank_cd(c.search_vector, plainto_tsquery('english', query_text), 32) AS score
     FROM chunks c
     WHERE c.search_vector @@ plainto_tsquery('english', query_text)
+      AND (filter_document_ids IS NULL OR c.document_id = ANY(filter_document_ids))
   ),
   -- Vector similarity search using cosine distance
   -- Lower threshold (0.3) to capture more candidates for fusion
+  -- ADDED: filter_document_ids filter in WHERE clause
   vector_results AS (
     SELECT
       c.id,
       c.document_id,
       c.content,
       c.page_number,
+      c.char_offset_start,
+      c.char_offset_end,
       (1 - (c.embedding <=> query_embedding)) AS score
     FROM chunks c
     WHERE (1 - (c.embedding <=> query_embedding)) > 0.3
+      AND (filter_document_ids IS NULL OR c.document_id = ANY(filter_document_ids))
   ),
   -- Combine all unique chunk IDs from both result sets
   all_chunk_ids AS (
@@ -100,6 +86,8 @@ BEGIN
       c.document_id,
       c.content,
       c.page_number,
+      c.char_offset_start,
+      c.char_offset_end,
       COALESCE(b.score, 0)::float AS bm25_score,
       COALESCE(v.score, 0)::float AS vector_score,
       (
@@ -116,6 +104,8 @@ BEGIN
     sr.document_id,
     sr.content,
     sr.page_number,
+    sr.char_offset_start,
+    sr.char_offset_end,
     sr.bm25_score,
     sr.vector_score,
     sr.combined_score
@@ -127,12 +117,13 @@ END;
 $$;
 
 -- ============================================================================
--- Step 6: Create helper function for BM25-only search (useful for debugging)
+-- Step 3: Recreate bm25_search_chunks with document filter parameter
 -- ============================================================================
 
 CREATE OR REPLACE FUNCTION bm25_search_chunks(
   query_text text,
-  match_count int DEFAULT 10
+  match_count int DEFAULT 10,
+  filter_document_ids bigint[] DEFAULT NULL  -- NEW: Optional document filter
 )
 RETURNS TABLE (
   id bigint,
@@ -153,14 +144,26 @@ BEGIN
     ts_rank_cd(c.search_vector, plainto_tsquery('english', query_text), 32)::float AS score
   FROM chunks c
   WHERE c.search_vector @@ plainto_tsquery('english', query_text)
+    AND (filter_document_ids IS NULL OR c.document_id = ANY(filter_document_ids))
   ORDER BY score DESC
   LIMIT match_count;
 END;
 $$;
 
 -- ============================================================================
--- Grant permissions (adjust based on your Supabase setup)
+-- Step 4: Grant permissions
 -- ============================================================================
 
 GRANT EXECUTE ON FUNCTION hybrid_search_chunks TO anon, authenticated;
 GRANT EXECUTE ON FUNCTION bm25_search_chunks TO anon, authenticated;
+
+-- ============================================================================
+-- Migration complete
+-- ============================================================================
+-- Usage:
+--   -- No filter (search all documents):
+--   SELECT * FROM hybrid_search_chunks('yield strength S32205', embedding, 10, 0.3, 0.7, NULL);
+--
+--   -- Filter to specific document(s):
+--   SELECT * FROM hybrid_search_chunks('yield strength S32205', embedding, 10, 0.3, 0.7, ARRAY[5]);
+--   SELECT * FROM hybrid_search_chunks('compare A789 vs A790', embedding, 10, 0.3, 0.7, ARRAY[4, 5]);
