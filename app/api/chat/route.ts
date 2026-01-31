@@ -13,13 +13,18 @@ import { enhanceQuery, shouldEnhanceQuery } from "@/lib/query-enhancement";
 import { detectFormulaRequest, hasFormulaInChunks, getFormulaRefusalInstruction } from "@/lib/formula-detector";
 
 /**
- * Chat API Route - RAG-powered Q&A
+ * Chat API Route - RAG-powered Q&A (with Streaming)
  *
  * This endpoint:
  * 1. Validates the user query
  * 2. Searches for relevant document chunks
  * 3. Builds context from retrieved documents
  * 4. Generates a response with citations using Groq (Llama 3.3 70B)
+ *
+ * Streaming:
+ * - Uses SSE to keep connection alive during long RAG operations
+ * - Sends heartbeat every 3s to prevent Vercel Hobby 10s timeout
+ * - Final response sent as JSON in data: field
  *
  * Rate Limit Handling:
  * - Uses ModelFallbackClient for automatic model fallback
@@ -33,50 +38,116 @@ import { detectFormulaRequest, hasFormulaInChunks, getFormulaRefusalInstruction 
  */
 
 export async function POST(request: NextRequest) {
+  // Parse body first (outside try block for streaming)
+  let body;
   try {
-    // ========================================
-    // Step 1: Parse and Validate Input
-    // ========================================
-    const body = await request.json();
-    const { query, verified = false } = body;
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
+  }
 
-    // Validate query using our validation utility
-    const validation = validateQuery(query);
-    if (!validation.isValid) {
-      const error = createValidationError(validation.error || "Invalid query");
-      return NextResponse.json(error, { status: getErrorStatusCode("VALIDATION_ERROR") });
-    }
+  const { query, verified = false, stream = true } = body;
 
-    // Use the cleaned, sanitized query
-    const cleanedQuery = validation.cleanedQuery!;
+  // Validate query
+  const validation = validateQuery(query);
+  if (!validation.isValid) {
+    const error = createValidationError(validation.error || "Invalid query");
+    return NextResponse.json(error, { status: getErrorStatusCode("VALIDATION_ERROR") });
+  }
 
-    // DEBUG: Log incoming query to trace request flow
-    console.log(`[Chat API] Incoming query: "${cleanedQuery}"`);
+  const cleanedQuery = validation.cleanedQuery!;
 
-    // ========================================
-    // Optional: Use Verified Generation Pipeline
-    // ========================================
-    // When verified=true, use the full zero-hallucination pipeline
-    // with claim verification and guardrails
-    if (verified) {
-      console.log("[Chat API] Using verified generation pipeline");
-      const result = await generateVerifiedResponse(cleanedQuery, {
-        enable_verification: true,
-        enable_knowledge_graph: true,
-        min_confidence: 70,
-      });
+  // If streaming is disabled, use the original non-streaming path
+  if (!stream) {
+    return handleNonStreamingRequest(cleanedQuery, verified);
+  }
 
-      return NextResponse.json({
-        response: result.response,
-        sources: result.sources,
-        verification: result.verification,
-        knowledge_insights: result.knowledge_insights,
-      });
-    }
+  // ========================================
+  // Streaming Response (keeps connection alive)
+  // ========================================
+  const encoder = new TextEncoder();
 
-    // ========================================
-    // Step 2: Search for Relevant Documents (Hybrid Search)
-    // ========================================
+  const readableStream = new ReadableStream({
+    async start(controller) {
+      // Heartbeat interval to keep connection alive
+      const heartbeatInterval = setInterval(() => {
+        try {
+          controller.enqueue(encoder.encode(": heartbeat\n\n"));
+        } catch {
+          // Stream closed, stop heartbeat
+          clearInterval(heartbeatInterval);
+        }
+      }, 3000);
+
+      try {
+        // Process the query
+        const result = await processRAGQuery(cleanedQuery, verified);
+
+        // Send the final response
+        controller.enqueue(encoder.encode(`data: ${JSON.stringify(result)}\n\n`));
+        controller.close();
+      } catch (error) {
+        // Send error response
+        const errorMsg = error instanceof Error ? error.message : "Unknown error";
+        controller.enqueue(encoder.encode(`data: ${JSON.stringify({ error: errorMsg })}\n\n`));
+        controller.close();
+      } finally {
+        clearInterval(heartbeatInterval);
+      }
+    },
+  });
+
+  return new Response(readableStream, {
+    headers: {
+      "Content-Type": "text/event-stream",
+      "Cache-Control": "no-cache",
+      "Connection": "keep-alive",
+    },
+  });
+}
+
+/**
+ * Non-streaming request handler (for backwards compatibility)
+ */
+async function handleNonStreamingRequest(cleanedQuery: string, verified: boolean) {
+  try {
+    const result = await processRAGQuery(cleanedQuery, verified);
+    return NextResponse.json(result);
+  } catch (error) {
+    const { response, status } = handleApiError(error, "Chat API");
+    return NextResponse.json(response, { status });
+  }
+}
+
+/**
+ * Core RAG processing logic (shared by streaming and non-streaming)
+ */
+async function processRAGQuery(cleanedQuery: string, verified: boolean) {
+  // DEBUG: Log incoming query to trace request flow
+  console.log(`[Chat API] Incoming query: "${cleanedQuery}"`);
+
+  // ========================================
+  // Optional: Use Verified Generation Pipeline
+  // ========================================
+  if (verified) {
+    console.log("[Chat API] Using verified generation pipeline");
+    const result = await generateVerifiedResponse(cleanedQuery, {
+      enable_verification: true,
+      enable_knowledge_graph: true,
+      min_confidence: 70,
+    });
+
+    return {
+      response: result.response,
+      sources: result.sources,
+      verification: result.verification,
+      knowledge_insights: result.knowledge_insights,
+    };
+  }
+
+  // ========================================
+  // Step 2: Search for Relevant Documents (Hybrid Search)
+  // ========================================
     // Backend query enhancement (invisible to user)
     // This adds document-specific keywords and table hints to improve retrieval
     let searchQuery = cleanedQuery;
@@ -434,20 +505,14 @@ RESPONSE GUIDELINES:
       storage_path: s.storage_path?.slice(-40), // Last 40 chars of path for debugging
     })));
 
-    // ========================================
-    // Step 6: Return Response
-    // ========================================
-    // DEBUG: Log response summary for tracing
-    console.log(`[Chat API] Returning response with ${sources.length} sources (${responseText.length} chars)`);
+  // ========================================
+  // Step 6: Return Response
+  // ========================================
+  // DEBUG: Log response summary for tracing
+  console.log(`[Chat API] Returning response with ${sources.length} sources (${responseText.length} chars)`);
 
-    return NextResponse.json({
-      response: responseText,
-      sources,
-    });
-
-  } catch (error) {
-    // Use our safe error handler - never leaks internal details
-    const { response, status } = handleApiError(error, "Chat API");
-    return NextResponse.json(response, { status });
-  }
+  return {
+    response: responseText,
+    sources,
+  };
 }

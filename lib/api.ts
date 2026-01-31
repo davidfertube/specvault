@@ -187,7 +187,7 @@ export class ApiRequestError extends Error {
 
 /**
  * Query the knowledge base with a user question
- * Falls back to demo mode if backend is unavailable
+ * Uses SSE streaming to prevent Vercel Hobby timeout (10s)
  * @param query - The user's question
  * @returns The AI-generated response with source citations
  */
@@ -202,7 +202,7 @@ export async function queryKnowledgeBase(query: string): Promise<ChatResponse> {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ query }),
+      body: JSON.stringify({ query, stream: true }),
       signal: controller.signal,
     });
 
@@ -220,6 +220,44 @@ export async function queryKnowledgeBase(query: string): Promise<ChatResponse> {
       throw new ApiRequestError(errorMessage, response.status);
     }
 
+    // Handle SSE streaming response
+    const contentType = response.headers.get('content-type');
+    if (contentType?.includes('text/event-stream')) {
+      // Read the stream and extract the final data
+      const reader = response.body?.getReader();
+      if (!reader) {
+        throw new ApiRequestError('No response body', 500);
+      }
+
+      const decoder = new TextDecoder();
+      let result = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value, { stream: true });
+        result += chunk;
+
+        // Look for data: line which contains the final response
+        const dataMatch = result.match(/data: (.+)\n/);
+        if (dataMatch) {
+          const jsonStr = dataMatch[1];
+          const parsed = JSON.parse(jsonStr);
+
+          // Check if it's an error response
+          if (parsed.error) {
+            throw new ApiRequestError(parsed.error, 500);
+          }
+
+          return parsed as ChatResponse;
+        }
+      }
+
+      throw new ApiRequestError('No data received from stream', 500);
+    }
+
+    // Fallback: regular JSON response (non-streaming)
     return response.json();
   } catch (error) {
     // DEMO MODE DISABLED: Previously fell back to hardcoded responses, causing
