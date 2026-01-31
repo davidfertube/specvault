@@ -178,8 +178,9 @@ async function processRAGQuery(cleanedQuery: string, verified: boolean) {
     try {
       // Use agentic multi-query RAG (query decomposition + hybrid search + re-ranking)
       // Use enhanced query for search, but original query is shown to user
+      // Reduced from 5 to 3 chunks to stay under Groq's 6000 TPM free tier limit
       const ragResult = await withTimeout(
-        multiQueryRAG(searchQuery, 5),
+        multiQueryRAG(searchQuery, 3),
         TIMEOUTS.MULTI_QUERY_RAG || 45000, // Use dedicated timeout for RAG pipeline
         "Multi-query RAG"
       );
@@ -226,7 +227,7 @@ async function processRAGQuery(cleanedQuery: string, verified: boolean) {
           // Apply document filter even in fallback mode to fix A789/A790 confusion
           // Pass full query to catch "per A790" patterns
           const documentIds = await resolveSpecsToDocuments(processedQuery.extractedCodes, cleanedQuery);
-          chunks = await searchWithFallback(searchQuery, 5, documentIds);
+          chunks = await searchWithFallback(searchQuery, 3, documentIds);
           console.log(`[Chat API] Fallback search returned ${chunks.length} chunks${documentIds ? ` (filtered to docs: ${documentIds.join(", ")})` : ""}`);
         } catch (fallbackError) {
           console.error("[Chat API] Fallback search also failed:", fallbackError);
