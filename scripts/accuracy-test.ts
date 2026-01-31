@@ -1,12 +1,17 @@
 #!/usr/bin/env tsx
 /**
- * 100-Query Accuracy Test Suite
+ * 80-Query Accuracy Test Suite
  *
- * Tests RAG accuracy across 10 documents with:
+ * Tests RAG accuracy across 8 indexed documents with:
  * - 6 medium queries per doc (single property lookup)
  * - 4 complex queries per doc (comparisons, multi-step, calculations)
  *
- * Target: 75%+ overall accuracy for MVP launch
+ * Documents tested: A790, A789, A312, A872, 5CT, 6A, 16C, 5CRA
+ * (A240 and A182 excluded - not in indexed document library)
+ *
+ * Targets:
+ * - Answer Accuracy: 75%+
+ * - Source Accuracy: 80%+
  */
 
 import dotenv from "dotenv";
@@ -709,169 +714,7 @@ const TEST_CASES: TestCase[] = [
     notes: "Supplementary requirements"
   },
 
-  // ===== ASTM A240 - Stainless Steel Plate (10 queries) =====
-  {
-    id: "A240-01",
-    document: "ASTM A240",
-    query: "What is the scope of ASTM A240?",
-    difficulty: "medium",
-    expectedPatterns: [/plate|sheet|strip|stainless|chromium/i],
-    notes: "Flat-rolled stainless products"
-  },
-  {
-    id: "A240-02",
-    document: "ASTM A240",
-    query: "What is the minimum tensile strength for Type 304 per A240?",
-    difficulty: "medium",
-    expectedPatterns: [/75\s*ksi|515\s*MPa|tensile/i],
-    notes: "Type 304 tensile = 75 ksi"
-  },
-  {
-    id: "A240-03",
-    document: "ASTM A240",
-    query: "What is the yield strength for Type 316L plate per A240?",
-    difficulty: "medium",
-    expectedPatterns: [/25\s*ksi|170\s*MPa|yield/i],
-    notes: "316L yield = 25 ksi"
-  },
-  {
-    id: "A240-04",
-    document: "ASTM A240",
-    query: "What thickness tolerances apply to A240 plate?",
-    difficulty: "medium",
-    expectedPatterns: [/tolerance|thickness|%|deviation/i],
-    notes: "Thickness tolerances"
-  },
-  {
-    id: "A240-05",
-    document: "ASTM A240",
-    query: "What surface finish is required for A240?",
-    difficulty: "medium",
-    expectedPatterns: [/finish|surface|2B|2D|bright/i],
-    notes: "Surface finish requirements"
-  },
-  {
-    id: "A240-06",
-    document: "ASTM A240",
-    query: "What heat treatment is required for Type 2205 per A240?",
-    difficulty: "medium",
-    expectedPatterns: [/heat|treatment|anneal|solution|2205/i],
-    notes: "2205 heat treatment"
-  },
-  {
-    id: "A240-07",
-    document: "ASTM A240",
-    query: "Compare mechanical properties of Type 304 vs Type 316 per A240",
-    difficulty: "complex",
-    expectedPatterns: [/304|316|yield|tensile|strength/i],
-    notes: "304 vs 316 comparison"
-  },
-  {
-    id: "A240-08",
-    document: "ASTM A240",
-    query: "What are the chemical requirements for Type 2205 duplex per A240?",
-    difficulty: "complex",
-    expectedPatterns: [/2205|chromium|nickel|molybdenum|nitrogen|chemical/i],
-    notes: "2205 composition"
-  },
-  {
-    id: "A240-09",
-    document: "ASTM A240",
-    query: "What bend test requirements apply to A240?",
-    difficulty: "complex",
-    expectedPatterns: [/bend|test|mandrel|radius/i],
-    notes: "Bend test requirements"
-  },
-  {
-    id: "A240-10",
-    document: "ASTM A240",
-    query: "What grades in A240 are classified as duplex stainless steel?",
-    difficulty: "complex",
-    expectedPatterns: [/2205|2304|2507|duplex/i],
-    notes: "Duplex grades in A240"
-  },
-
-  // ===== ASTM A182 - Forged Fittings (10 queries) =====
-  {
-    id: "A182-01",
-    document: "ASTM A182",
-    query: "What is the scope of ASTM A182?",
-    difficulty: "medium",
-    expectedPatterns: [/forged|fitting|flange|valve|pipe/i],
-    notes: "Forged/rolled fittings and flanges"
-  },
-  {
-    id: "A182-02",
-    document: "ASTM A182",
-    query: "What is the tensile strength for F316L per A182?",
-    difficulty: "medium",
-    expectedPatterns: [/70\s*ksi|485\s*MPa|tensile/i],
-    notes: "F316L tensile requirements"
-  },
-  {
-    id: "A182-03",
-    document: "ASTM A182",
-    query: "What hardness is required for F304 per A182?",
-    difficulty: "medium",
-    expectedPatterns: [/hardness|HBW|HRC|217/i],
-    notes: "Hardness limits"
-  },
-  {
-    id: "A182-04",
-    document: "ASTM A182",
-    query: "What heat treatment is required for F51 (2205 duplex) per A182?",
-    difficulty: "medium",
-    expectedPatterns: [/heat|treatment|anneal|solution|F51|2205/i],
-    notes: "F51 duplex heat treatment"
-  },
-  {
-    id: "A182-05",
-    document: "ASTM A182",
-    query: "What material grade designations are used in A182?",
-    difficulty: "medium",
-    expectedPatterns: [/F304|F316|F51|F53|F55|grade/i],
-    notes: "Grade designations"
-  },
-  {
-    id: "A182-06",
-    document: "ASTM A182",
-    query: "What testing is required for A182 fittings?",
-    difficulty: "medium",
-    expectedPatterns: [/test|tension|hardness|impact/i],
-    notes: "Testing requirements"
-  },
-  {
-    id: "A182-07",
-    document: "ASTM A182",
-    query: "Compare F316 vs F316L requirements per A182",
-    difficulty: "complex",
-    expectedPatterns: [/F316|F316L|carbon|strength/i],
-    notes: "Standard vs L grade comparison"
-  },
-  {
-    id: "A182-08",
-    document: "ASTM A182",
-    query: "What are all the duplex grades covered by A182?",
-    difficulty: "complex",
-    expectedPatterns: [/F51|F53|F55|F60|F61|duplex/i],
-    notes: "Duplex grades in A182"
-  },
-  {
-    id: "A182-09",
-    document: "ASTM A182",
-    query: "What impact test requirements apply to A182 at low temperature?",
-    difficulty: "complex",
-    expectedPatterns: [/impact|charpy|temperature|joule|ft.*lb/i],
-    notes: "Impact test requirements"
-  },
-  {
-    id: "A182-10",
-    document: "ASTM A182",
-    query: "What marking requirements apply to A182 flanges?",
-    difficulty: "complex",
-    expectedPatterns: [/marking|identification|grade|heat/i],
-    notes: "Marking requirements"
-  },
+  // NOTE: ASTM A240 and A182 removed - documents not uploaded to database
 ];
 
 // ============================================
@@ -913,6 +756,37 @@ async function querySpecAgents(query: string): Promise<{
   }
 }
 
+/**
+ * Extract ASTM/API specification code from a filename or document name
+ *
+ * Examples:
+ * - "877794297-A312-A312M-25.pdf" → "A312"
+ * - "ASTM A790" → "A790"
+ * - "API Spec 5CT Purchasing Guidelines 9th Edition 2012-04.pdf" → "5CT"
+ * - "API Spec 6A Wellhead & Xmas Tree Equipment 20th Edition.pdf" → "6A"
+ * - "API Spec 16C Choke & Kill Systems 1993.pdf" → "16C"
+ * - "API 5CRA" → "5CRA"
+ */
+function extractSpecCode(nameOrFilename: string): string | null {
+  const upper = nameOrFilename.toUpperCase();
+
+  // Match ASTM A-series codes: A789, A790, A312, A182, A240, A872, A1049
+  const astmMatch = upper.match(/\bA\d{3,4}\b/);
+  if (astmMatch) return astmMatch[0];
+
+  // Match API codes - try context-aware match first (after "API" or "SPEC")
+  // This avoids matching "9TH" from "9th Edition"
+  const apiContextMatch = upper.match(/(?:API|SPEC)\s+(\d{1,2}[A-Z]{1,4})\b/);
+  if (apiContextMatch) return apiContextMatch[1];
+
+  // Fallback: Match known API spec patterns specifically
+  // 5CT, 5CRA, 6A, 16C - digits followed by specific letter combinations
+  const apiSpecificMatch = upper.match(/\b(\d{1,2}(?:CT|CRA|[A-Z]))\b/);
+  if (apiSpecificMatch) return apiSpecificMatch[1];
+
+  return null;
+}
+
 function evaluateTest(
   testCase: TestCase,
   response: string,
@@ -947,13 +821,12 @@ function evaluateTest(
     }
   }
 
-  // Check source accuracy
+  // Check source accuracy by comparing extracted spec codes
+  // This handles filename variations like "877794297-A312-A312M-25.pdf" vs "ASTM A312"
   const sourceDocument = sources.length > 0 ? sources[0].document : null;
-  const expectedDocLower = testCase.document.toLowerCase().replace(/\s+/g, "");
-  const sourceAccurate = sourceDocument
-    ? sourceDocument.toLowerCase().replace(/\s+/g, "").includes(expectedDocLower) ||
-      expectedDocLower.includes(sourceDocument.toLowerCase().replace(/[^a-z0-9]/g, ""))
-    : false;
+  const sourceCode = sourceDocument ? extractSpecCode(sourceDocument) : null;
+  const expectedCode = extractSpecCode(testCase.document);
+  const sourceAccurate = !!(sourceCode && expectedCode && sourceCode === expectedCode);
 
   // Pass if at least 50% patterns matched and no forbidden patterns
   const patternPassRate = matchedPatterns.length / testCase.expectedPatterns.length;

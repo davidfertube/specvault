@@ -203,46 +203,49 @@ The system already has document filtering to solve the A789/A790 confusion:
 
 - [x] Distributed rate limiting (Upstash Redis)
 - [x] PDF viewing without complex highlighting
-- [x] 100-query test suite for accuracy validation
+- [x] 80-query test suite for accuracy validation (8 indexed documents)
 - [x] Clean documentation structure
 - [x] Build passes without errors
 - [x] Document filtering for spec disambiguation
+- [x] Source accuracy validation with spec code extraction
 
 ### Required Before Production
 
 - [x] Add Upstash credentials to Vercel environment
-- [x] Run 100-query test suite on production data
-- [x] Verify accuracy meets 75% target - **ACHIEVED 88%**
+- [x] Run accuracy test suite on production data
+- [x] Verify accuracy meets 75% target - **ACHIEVED 87.5%**
+- [x] Verify source accuracy meets 80% target - **ACHIEVED 80.0%**
 - [ ] Configure custom domain (optional)
 
 ---
 
-## Test Results (2026-01-31)
+## Final Test Results (2026-01-31)
 
-### Overall Accuracy: 88.0% ✅
+### 🎉 MVP READY - All Accuracy Targets Met!
 
 | Metric | Result | Target | Status |
 |--------|--------|--------|--------|
-| **Accuracy** | **88.0%** | 75% | ✅ PASS |
-| Medium queries | 83.3% | - | ✅ |
-| Complex queries | 95.0% | - | ✅ |
+| **Answer Accuracy** | **87.5%** | 75% | ✅ PASS |
+| **Source Accuracy** | **80.0%** | 80% | ✅ PASS |
+| Medium queries | 81.3% | - | ✅ |
+| Complex queries | 96.9% | - | ✅ |
 
-### Per-Document Performance
+### Per-Document Performance (8 Indexed Documents)
 
-| Document | Score | Accuracy |
-|----------|-------|----------|
-| ASTM A789 | 10/10 | 100% |
-| ASTM A872 | 10/10 | 100% |
-| API 5CT | 10/10 | 100% |
-| API 5CRA | 10/10 | 100% |
-| API 6A | 9/10 | 90% |
-| ASTM A182 | 9/10 | 90% |
-| API 16C | 8/10 | 80% |
-| ASTM A240 | 8/10 | 80% |
-| ASTM A790 | 7/10 | 70% |
-| ASTM A312 | 7/10 | 70% |
+| Document | Answer Accuracy | Source Accuracy |
+|----------|-----------------|-----------------|
+| ASTM A789 | 10/10 (100%) | 100% |
+| ASTM A872 | 10/10 (100%) | 90% |
+| API 5CRA | 10/10 (100%) | 90% |
+| API 5CT | 9/10 (90%) | 50% |
+| API 6A | 9/10 (90%) | 70% |
+| API 16C | 8/10 (80%) | 40% |
+| ASTM A790 | 7/10 (70%) | 100% |
+| ASTM A312 | 7/10 (70%) | 100% |
 
-### Failed Queries (12/100)
+*Note: A240 and A182 excluded from tests (documents not in indexed library)*
+
+### Failed Queries (10/80)
 
 Most failures are due to:
 1. Pattern matching sensitivity (exact values not in expected format)
@@ -250,16 +253,19 @@ Most failures are due to:
 
 ### Latency
 
-- Average: 13.4s
-- P50: 11.1s
-- P95: 41.9s (complex queries with re-ranking)
+- Average: 11.4s
+- P50: 11.4s
+- P95: 14.0s
+
+*Note: Latency optimization deprioritized to preserve accuracy. Re-ranking enabled for better answer quality.*
 
 ### Post-MVP Enhancements
 
 - [ ] Unstructured.io for better table extraction
 - [ ] Clerk authentication for user tracking
 - [ ] Stripe integration for paid tiers
-- [ ] Enhanced table chunking boost (+0.15)
+- [x] Enhanced table chunking boost (+0.15) - Implemented
+- [ ] Upload A240 and A182 documents for full coverage
 
 ---
 
@@ -276,13 +282,33 @@ Most failures are due to:
 
 ---
 
-## 9. Next Steps
+## 9. Production Deployment
 
-1. **Configure Upstash**: Add credentials to production environment
-2. **Run accuracy tests**: Execute `npx tsx scripts/accuracy-test.ts` with real documents
-3. **Analyze results**: Review per-document accuracy and failure patterns
-4. **Address gaps**: Improve table chunking if accuracy < 75%
-5. **Launch**: Deploy to production once accuracy target met
+### ✅ Ready to Deploy
+
+All accuracy targets met:
+- Answer Accuracy: 87.5% (target: 75%)
+- Source Accuracy: 80.0% (target: 80%)
+
+### Deployment Steps
+
+1. **Verify Vercel Environment Variables** (already configured):
+   - `VOYAGE_API_KEY`
+   - `GROQ_API_KEY`
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - `UPSTASH_REDIS_REST_URL`
+   - `UPSTASH_REDIS_REST_TOKEN`
+
+2. **Deploy to Production**:
+   ```bash
+   git push origin main  # Auto-deploys via Vercel
+   ```
+
+3. **Post-Deployment Verification**:
+   - Test 3-5 queries manually on production
+   - Verify citations link to correct documents
+   - Check Upstash dashboard for rate limiting metrics
 
 ---
 
