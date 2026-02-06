@@ -558,7 +558,7 @@ const testCases = [
   }
 ];
 
-const evaluation = await evaluator.evaluate(specAgent, testCases);
+const evaluation = await evaluator.evaluate(specVault, testCases);
 // Result: { accuracy: 94.5%, citationRate: 100%, latency: 10.4s, ... }
 ```
 
