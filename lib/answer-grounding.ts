@@ -74,10 +74,11 @@ export function groundResponse(
     const isGrounded = hasMatchingNumber(rn.value, sourceNumbers);
     if (isGrounded) {
       groundedCount++;
-    } else if (rn.value > 10 && hasRawNumberInChunks(rn.value, chunks)) {
+    } else if ((rn.value > 10 || !Number.isInteger(rn.value)) && hasRawNumberInChunks(rn.value, chunks)) {
       // Secondary check: look for bare number in chunk text (handles table values).
       // ASTM tables store values without adjacent units — units are in the header row.
-      // Only for values > 10 to avoid false positives from page/section numbers.
+      // Integer threshold > 10 avoids false positives from page/section numbers.
+      // Decimals (e.g., 0.08% carbon) always pass — they're never page numbers.
       groundedCount++;
     } else {
       ungrounded.push(rn);
