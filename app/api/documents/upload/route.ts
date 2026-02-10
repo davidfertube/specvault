@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { MAX_PDF_SIZE } from "@/lib/validation";
 import { handleApiError, createValidationError, getErrorStatusCode } from "@/lib/errors";
+import { serverAuth } from "@/lib/auth";
+import { enforceQuota, QuotaExceededError } from "@/lib/quota";
 
 /**
  * Document Upload Confirmation API Route
@@ -35,6 +37,32 @@ interface UploadConfirmRequest {
 
 export async function POST(request: NextRequest) {
   try {
+    // ========================================
+    // Step 0: Authentication and Quota Check
+    // ========================================
+    const user = await serverAuth.getCurrentUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized - Authentication required" }, { status: 401 });
+    }
+
+    const profile = await serverAuth.getUserProfile(user.id);
+    if (!profile || !profile.workspace_id) {
+      return NextResponse.json({ error: "User profile or workspace not found" }, { status: 403 });
+    }
+
+    // Check document quota before processing upload
+    try {
+      await enforceQuota(profile.workspace_id, 'document');
+    } catch (error) {
+      if (error instanceof QuotaExceededError) {
+        return NextResponse.json(
+          { error: error.message, code: "QUOTA_EXCEEDED" },
+          { status: 429 }
+        );
+      }
+      throw error;
+    }
+
     // ========================================
     // Step 1: Parse and Validate Request Body
     // ========================================

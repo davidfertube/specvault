@@ -15,6 +15,8 @@ import { groundResponse } from "@/lib/answer-grounding";
 import { validateResponseCoherence } from "@/lib/response-validator";
 import { getLangfuse, flushLangfuse } from "@/lib/langfuse";
 import { getCachedResponse, setCachedResponse } from "@/lib/query-cache";
+import { serverAuth } from "@/lib/auth";
+import { enforceQuota, QuotaExceededError } from "@/lib/quota";
 
 /**
  * Chat API Route - RAG-powered Q&A (with Streaming)
@@ -42,6 +44,30 @@ import { getCachedResponse, setCachedResponse } from "@/lib/query-cache";
  */
 
 export async function POST(request: NextRequest) {
+  // Require authentication
+  const user = await serverAuth.getCurrentUser();
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized - Authentication required" }, { status: 401 });
+  }
+
+  const profile = await serverAuth.getUserProfile(user.id);
+  if (!profile || !profile.workspace_id) {
+    return NextResponse.json({ error: "User profile or workspace not found" }, { status: 403 });
+  }
+
+  // Check quota before processing
+  try {
+    await enforceQuota(profile.workspace_id, 'query');
+  } catch (error) {
+    if (error instanceof QuotaExceededError) {
+      return NextResponse.json(
+        { error: error.message, code: "QUOTA_EXCEEDED" },
+        { status: 429 }
+      );
+    }
+    throw error;
+  }
+
   // Parse body first (outside try block for streaming)
   let body;
   try {
