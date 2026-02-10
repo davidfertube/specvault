@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { checkRateLimit, getRateLimitHeaders, getClientIp } from './lib/rate-limit';
+import { createServerClient } from '@supabase/ssr';
 
 // Allowed origins for CSRF protection
 const ALLOWED_ORIGINS = [
@@ -29,17 +30,93 @@ const CSRF_PROTECTED_ROUTES = [
   '/api/leads',
 ];
 
+// Public routes that don't require authentication
+const PUBLIC_ROUTES = [
+  '/',
+  '/auth/login',
+  '/auth/signup',
+  '/auth/callback',
+  '/auth/forgot-password',
+  '/auth/reset-password',
+  '/privacy',
+  '/terms',
+  '/api/health',
+  '/api/leads', // Waitlist signup
+];
+
+// API routes that require authentication
+const PROTECTED_API_ROUTES = [
+  '/api/chat',
+  '/api/documents',
+  '/api/feedback',
+];
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const method = request.method;
 
-  // Skip non-API routes
-  if (!pathname.startsWith('/api/')) {
+  // Skip health check
+  if (pathname === '/api/health') {
     return NextResponse.next();
   }
 
-  // Skip health check
-  if (pathname === '/api/health') {
+  // Authentication check for protected routes
+  const isProtectedRoute = !PUBLIC_ROUTES.some(route =>
+    pathname === route || pathname.startsWith(route)
+  );
+
+  if (isProtectedRoute) {
+    // Check for API key in header (for programmatic access)
+    const apiKey = request.headers.get('x-api-key');
+
+    if (!apiKey) {
+      // Check for session cookie (for browser access)
+      const response = NextResponse.next();
+
+      const supabase = createServerClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        {
+          cookies: {
+            get(name: string) {
+              return request.cookies.get(name)?.value;
+            },
+            set(name: string, value: string, options: any) {
+              response.cookies.set(name, value, options);
+            },
+            remove(name: string, options: any) {
+              response.cookies.delete(name);
+            },
+          },
+        }
+      );
+
+      const { data: { session } } = await supabase.auth.getSession();
+
+      // If no session and trying to access protected page/API, redirect to login
+      if (!session) {
+        if (pathname.startsWith('/api/')) {
+          return new NextResponse(
+            JSON.stringify({ error: 'Unauthorized - Authentication required' }),
+            {
+              status: 401,
+              headers: { 'Content-Type': 'application/json' },
+            }
+          );
+        }
+
+        // Redirect to login for protected pages
+        const loginUrl = new URL('/auth/login', request.url);
+        loginUrl.searchParams.set('redirect', pathname);
+        return NextResponse.redirect(loginUrl);
+      }
+
+      return response;
+    }
+  }
+
+  // Skip further middleware for non-API routes
+  if (!pathname.startsWith('/api/')) {
     return NextResponse.next();
   }
 
@@ -140,5 +217,9 @@ export const config = {
   matcher: [
     // Match all API routes
     '/api/:path*',
+    // Match all protected app routes
+    '/dashboard/:path*',
+    '/account/:path*',
+    '/workspace/:path*',
   ],
 };
